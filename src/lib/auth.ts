@@ -5,7 +5,12 @@ export type SessionUser = User;
 
 export interface GetSessionResponse {
 	user: User;
-	session: { id: string; createdAt: string; expiresAt: string };
+	session: {
+		id: string;
+		token: string;
+		createdAt: string;
+		expiresAt: string;
+	};
 }
 
 export async function getSession(): Promise<GetSessionResponse | null> {
@@ -87,10 +92,9 @@ export async function signInEmail(
 export async function forgotPassword(
 	email: string,
 ): Promise<{ status: boolean }> {
-	const callbackURL = `${window.location.origin}/redefinir-senha`;
 	const { data } = await api.post<{ status: boolean }>(
-		'/api/auth/forget-password',
-		{ email, callbackURL },
+		'/api/auth/request-password-reset',
+		{ email },
 	);
 	return data;
 }
@@ -172,13 +176,13 @@ export interface SessionInfo {
 }
 
 export async function listSessions(): Promise<SessionInfo[]> {
-	const { data } = await api.get<{ sessions: SessionInfo[] }>(
-		'/api/auth/list-sessions',
-	);
-	return data.sessions;
+	const { data } = await api.get<SessionInfo[]>('/api/auth/list-sessions');
+	return data;
 }
 
-export async function revokeSession(token: string): Promise<{ status: boolean }> {
+export async function revokeSession(
+	token: string,
+): Promise<{ status: boolean }> {
 	const { data } = await api.post<{ status: boolean }>(
 		'/api/auth/revoke-session',
 		{ token },

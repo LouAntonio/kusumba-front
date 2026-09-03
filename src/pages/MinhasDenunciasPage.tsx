@@ -71,9 +71,11 @@ export function MinhasDenunciasPage() {
 							<div className="flex flex-wrap items-center justify-between gap-2">
 								<div className="flex items-center gap-3">
 									<Badge tone="danger">
-										{REPORT_TARGET_LABELS[
-											report.targetType
-										]}
+										{
+											REPORT_TARGET_LABELS[
+												report.targetType
+											]
+										}
 									</Badge>
 									<Badge tone="warning">
 										{REPORT_REASON_LABELS[report.reason]}

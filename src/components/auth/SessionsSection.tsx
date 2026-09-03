@@ -1,13 +1,16 @@
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { FaDesktop, FaExclamationTriangle, FaMobileAlt } from 'react-icons/fa';
 import {
-	FaDesktop,
-	FaExclamationTriangle,
-	FaMobileAlt,
-} from 'react-icons/fa';
-import { listSessions, revokeOtherSessions, revokeSession, type SessionInfo } from '../../lib/auth';
+	listSessions,
+	revokeOtherSessions,
+	revokeSession,
+	getSession,
+	type SessionInfo,
+} from '../../lib/auth';
 import { getApiError } from '../../lib/axios';
 import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
 import { Spinner } from '../ui/Spinner';
 import { formatDate } from '../../lib/format';
 
@@ -20,24 +23,46 @@ function isMobileAgent(ua: string | null | undefined): boolean {
 
 export function SessionsSection() {
 	const [sessions, setSessions] = useState<SessionInfo[]>([]);
+	const [currentToken, setCurrentToken] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [revokingToken, setRevokingToken] = useState<string | null>(null);
 	const [revokingOthers, setRevokingOthers] = useState(false);
 
-	const refresh = useCallback(async () => {
-		try {
-			const data = await listSessions();
-			setSessions(data);
-		} catch (error) {
-			toast.error(getApiError(error));
-		} finally {
-			setLoading(false);
-		}
+	const loadSessions = useCallback(async () => {
+		const [data, session] = await Promise.all([
+			listSessions(),
+			getSession(),
+		]);
+		return {
+			sessions: data,
+			currentToken: session?.session?.token ?? null,
+		};
 	}, []);
 
 	useEffect(() => {
-		void refresh();
-	}, [refresh]);
+		let active = true;
+		loadSessions()
+			.then((res) => {
+				if (!active) {
+					return;
+				}
+				setSessions(res.sessions);
+				setCurrentToken(res.currentToken);
+			})
+			.catch((error) => {
+				if (active) {
+					toast.error(getApiError(error));
+				}
+			})
+			.finally(() => {
+				if (active) {
+					setLoading(false);
+				}
+			});
+		return () => {
+			active = false;
+		};
+	}, [loadSessions]);
 
 	const handleRevoke = async (token: string) => {
 		setRevokingToken(token);
@@ -57,7 +82,9 @@ export function SessionsSection() {
 		try {
 			await revokeOtherSessions();
 			toast.success('Outras sessões terminadas.');
-			void refresh();
+			const res = await loadSessions();
+			setSessions(res.sessions);
+			setCurrentToken(res.currentToken);
 		} catch (error) {
 			toast.error(getApiError(error));
 		} finally {
@@ -65,7 +92,7 @@ export function SessionsSection() {
 		}
 	};
 
-	const current = sessions.find((s) => s.current === true) ?? null;
+	const current = sessions.find((s) => s.token === currentToken) ?? null;
 
 	return (
 		<Card className="p-6">
@@ -116,8 +143,12 @@ export function SessionsSection() {
 									<Button
 										size="sm"
 										variant="ghost"
-										onClick={() => handleRevoke(session.token)}
-										disabled={revokingToken === session.token}
+										onClick={() =>
+											handleRevoke(session.token)
+										}
+										disabled={
+											revokingToken === session.token
+										}
 									>
 										{revokingToken === session.token
 											? 'A terminar…'
