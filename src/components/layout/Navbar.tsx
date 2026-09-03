@@ -45,7 +45,7 @@ export function Navbar() {
 						<input
 							name="q"
 							placeholder="Procurar entre vizinhos…"
-							className="h-10 w-full rounded-full border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm focus:border-primary-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-200"
+							className="h-10 w-full rounded-full border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm"
 						/>
 					</div>
 				</form>
@@ -82,7 +82,7 @@ export function Navbar() {
 							<div className="relative">
 								<button
 									onClick={() => setMenuOpen((v) => !v)}
-									className="ml-1 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-300"
+									className="ml-1 rounded-full"
 									aria-label="Menu do perfil"
 								>
 									<Avatar

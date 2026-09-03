@@ -67,6 +67,12 @@ export interface User {
 	subscriptionTier: SubscriptionTier;
 	neighborhood?: string | null;
 	city?: string | null;
+	accounts?: {
+		id: string;
+		providerId: string;
+		accountId: string;
+	}[];
+	hasPassword?: boolean;
 }
 
 export interface Category {

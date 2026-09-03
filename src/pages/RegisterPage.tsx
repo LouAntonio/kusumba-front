@@ -13,6 +13,7 @@ export function RegisterPage() {
 	const navigate = useNavigate();
 	const setUser = useAuthStore((s) => s.setUser);
 	const [name, setName] = useState('');
+	const [surname, setSurname] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [confirm, setConfirm] = useState('');
@@ -30,7 +31,12 @@ export function RegisterPage() {
 		}
 		setSubmitting(true);
 		try {
-			const session = await signUp(name.trim(), email.trim(), password);
+			const session = await signUp(
+				name.trim(),
+				surname.trim(),
+				email.trim(),
+				password,
+			);
 			setUser(session?.user ?? null);
 			toast.success('Conta criada com sucesso!');
 			navigate('/anuncios');
@@ -96,7 +102,15 @@ export function RegisterPage() {
 						value={name}
 						onChange={(e) => setName(e.target.value)}
 						placeholder="O seu nome"
-						autoComplete="name"
+						autoComplete="given-name"
+						required
+					/>
+					<Input
+						label="Sobrenome"
+						value={surname}
+						onChange={(e) => setSurname(e.target.value)}
+						placeholder="O seu sobrenome"
+						autoComplete="family-name"
 						required
 					/>
 					<Input
@@ -130,7 +144,13 @@ export function RegisterPage() {
 					<Button
 						type="submit"
 						variant="primary"
-						disabled={submitting || !name || !email || !password}
+						disabled={
+							submitting ||
+							!name ||
+							!surname ||
+							!email ||
+							!password
+						}
 						fullWidth
 					>
 						{submitting ? 'A criar conta…' : 'Criar conta'}

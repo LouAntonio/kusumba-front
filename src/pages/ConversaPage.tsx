@@ -178,7 +178,7 @@ export function ConversaPage() {
 						}}
 						rows={1}
 						placeholder="Escreva uma mensagem…"
-						className="max-h-32 min-h-[2.5rem] flex-1 resize-none rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200"
+						className="max-h-32 min-h-[2.5rem] flex-1 resize-none rounded-xl border border-slate-300 px-3 py-2 text-sm"
 					/>
 					<button
 						onClick={send}

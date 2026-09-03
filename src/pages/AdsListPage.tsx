@@ -142,14 +142,14 @@ export function AdsListPage() {
 								type="number"
 								placeholder="Mínimo"
 								defaultValue={minPrice}
-								className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+								className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm"
 							/>
 							<input
 								name="maxPrice"
 								type="number"
 								placeholder="Máximo"
 								defaultValue={maxPrice}
-								className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+								className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm"
 							/>
 						</div>
 					</div>

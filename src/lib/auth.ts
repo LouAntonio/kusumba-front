@@ -76,12 +76,13 @@ export async function signOut(): Promise<void> {
 
 export async function signUp(
 	name: string,
+	surname: string,
 	email: string,
 	password: string,
 ): Promise<GetSessionResponse> {
 	const { data } = await api.post<GetSessionResponse>(
 		'/api/auth/sign-up/email',
-		{ name, email, password },
+		{ name, surname, email, password },
 	);
 	return data;
 }
@@ -115,6 +116,61 @@ export async function resetPassword(
 	const { data } = await api.post<{ status: boolean }>(
 		'/api/auth/reset-password',
 		{ token, newPassword },
+	);
+	return data;
+}
+
+export async function changePassword(
+	currentPassword: string,
+	newPassword: string,
+): Promise<{ status: boolean }> {
+	const { data } = await api.post<{ status: boolean }>(
+		'/api/auth/change-password',
+		{ currentPassword, newPassword },
+	);
+	return data;
+}
+
+export async function setPassword(
+	newPassword: string,
+): Promise<{ status: boolean }> {
+	const { data } = await api.post<{ status: boolean }>(
+		'/api/auth/set-password',
+		{ newPassword },
+	);
+	return data;
+}
+
+export async function changeEmail(
+	newEmail: string,
+	callbackURL?: string,
+): Promise<{ status: boolean }> {
+	const { data } = await api.post<{ status: boolean }>(
+		'/api/auth/change-email',
+		{
+			newEmail,
+			callbackURL: callbackURL ?? `${window.location.origin}/perfil`,
+		},
+	);
+	return data;
+}
+
+export async function linkGoogleWithIdToken(
+	idToken: string,
+): Promise<{ status: boolean }> {
+	const { data } = await api.post<{ status: boolean }>(
+		'/api/auth/link-social',
+		{ provider: 'google', idToken: { token: idToken } },
+	);
+	return data;
+}
+
+export async function unlinkGoogle(
+	accountId: string,
+): Promise<{ status: boolean }> {
+	const { data } = await api.post<{ status: boolean }>(
+		'/api/auth/unlink-account',
+		{ accountId },
 	);
 	return data;
 }

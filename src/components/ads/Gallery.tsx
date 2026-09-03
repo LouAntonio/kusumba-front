@@ -36,14 +36,14 @@ export function Gallery({
 					<>
 						<button
 							onClick={prev}
-							className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 text-slate-700 shadow-sm hover:bg-white focus:outline-none focus:ring-2 focus:ring-primary-300"
+							className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 text-slate-700 shadow-sm hover:bg-white"
 							aria-label="Imagem anterior"
 						>
 							<FaChevronLeft className="h-4 w-4" />
 						</button>
 						<button
 							onClick={next}
-							className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 text-slate-700 shadow-sm hover:bg-white focus:outline-none focus:ring-2 focus:ring-primary-300"
+							className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 text-slate-700 shadow-sm hover:bg-white"
 							aria-label="Próxima imagem"
 						>
 							<FaChevronRight className="h-4 w-4" />

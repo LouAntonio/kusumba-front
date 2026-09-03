@@ -25,7 +25,7 @@ export function FavoriteButton({
 			onClick={handleClick}
 			disabled={toggle.isPending}
 			className={cn(
-				'absolute right-2 top-2 rounded-full bg-white/90 p-2 text-slate-600 shadow-sm transition hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-primary-300',
+				'absolute right-2 top-2 rounded-full bg-white/90 p-2 text-slate-600 shadow-sm transition hover:text-red-500',
 				favorited && 'text-red-500',
 				className,
 			)}

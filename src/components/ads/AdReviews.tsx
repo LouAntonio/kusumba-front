@@ -59,7 +59,7 @@ export function AdReviews({ adId }: { adId: string }) {
 								onMouseEnter={() => setHover(star)}
 								onMouseLeave={() => setHover(0)}
 								onClick={() => setRating(star)}
-								className="text-2xl focus:outline-none"
+								className="text-2xl"
 								aria-label={`${star} estrelas`}
 							>
 								{star <= (hover || rating) ? (
