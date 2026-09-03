@@ -23,7 +23,7 @@ export function Navbar() {
 
 	return (
 		<header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
-			<div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6">
+			<div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6">
 				<Link to="/" className="shrink-0">
 					<Logo />
 				</Link>
@@ -130,8 +130,10 @@ function ProfileMenuItems({ onClose }: { onClose: () => void }) {
 	const user = useAuthStore((s) => s.user);
 	const clear = useAuthStore((s) => s.clear);
 	const navigate = useNavigate();
+	const [signingOut, setSigningOut] = useState(false);
 
 	const handleSignOut = async () => {
+		setSigningOut(true);
 		onClose();
 		try {
 			await signOut();
@@ -213,10 +215,11 @@ function ProfileMenuItems({ onClose }: { onClose: () => void }) {
 			<div className="border-t border-slate-100 py-1">
 				<button
 					onClick={handleSignOut}
-					className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+					disabled={signingOut}
+					className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 disabled:opacity-60"
 				>
 					<FaSignOutAlt className="h-4 w-4" />
-					Sair
+					{signingOut ? 'A sair…' : 'Sair'}
 				</button>
 			</div>
 		</>
@@ -230,8 +233,10 @@ function MobileMenuItems({
 }) {
 	const clear = useAuthStore((s) => s.clear);
 	const navigate = useNavigate();
+	const [signingOut, setSigningOut] = useState(false);
 
 	const handleSignOut = async () => {
+		setSigningOut(true);
 		try {
 			await signOut();
 		} catch {
@@ -271,9 +276,11 @@ function MobileMenuItems({
 					</Link>
 					<button
 						onClick={handleSignOut}
-						className="flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-red-600 hover:bg-red-50"
+						disabled={signingOut}
+						className="flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-60"
 					>
-						<FaSignOutAlt className="h-4 w-4" /> Sair
+						<FaSignOutAlt className="h-4 w-4" />{' '}
+						{signingOut ? 'A sair…' : 'Sair'}
 					</button>
 				</>
 			) : (

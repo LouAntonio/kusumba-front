@@ -16,7 +16,7 @@ export interface UploadResult {
 }
 
 export async function getSignedParams(): Promise<SignedParams> {
-	const { data } = await api.get<SignedParams>('/api/cloudinary/sign');
+	const { data } = await api.get<SignedParams>('/api/uploads/sign');
 	return data;
 }
 

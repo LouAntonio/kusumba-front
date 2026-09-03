@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { GoogleLogin } from '@react-oauth/google';
 import toast from 'react-hot-toast';
 import {
 	FaCheckCircle,
 	FaPhone,
 	FaMapMarkerAlt,
-	FaStar,
 	FaEnvelope,
 	FaLock,
 	FaGoogle,
@@ -27,24 +27,26 @@ import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { LoadingScreen } from '../components/ui/Spinner';
-import { formatKz } from '../lib/format';
 
 export function PerfilPage() {
+	const qc = useQueryClient();
 	const user = useAuthStore((s) => s.user);
+	const setUser = useAuthStore((s) => s.setUser);
 	const { data: me, isLoading } = useMe();
 	const [editing, setEditing] = useState(false);
 
-	const [name, setName] = useState(me?.name ?? user?.name ?? '');
-	const [surname, setSurname] = useState(me?.surname ?? '');
-	const [phone, setPhone] = useState(me?.phone ?? '');
-	const [neighborhood, setNeighborhood] = useState(me?.neighborhood ?? '');
-	const [city, setCity] = useState(me?.city ?? 'Luanda');
+	const [name, setName] = useState('');
+	const [surname, setSurname] = useState('');
+	const [phone, setPhone] = useState('');
+	const [neighborhood, setNeighborhood] = useState('');
+	const [city, setCity] = useState('Luanda');
 	const [saving, setSaving] = useState(false);
 
 	const linkedGoogle = me?.accounts?.find(
 		(acc) => acc.providerId === 'google',
 	);
-	const hasPassword = me?.hasPassword;
+	const hasPassword = me?.hasPassword === true;
+	const passwordMode: 'set' | 'change' = hasPassword ? 'change' : 'set';
 
 	const [newEmail, setNewEmail] = useState('');
 	const [sendingEmail, setSendingEmail] = useState(false);
@@ -53,11 +55,27 @@ export function PerfilPage() {
 	const [newPassword, setNewPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
 	const [sendingPassword, setSendingPassword] = useState(false);
-	const [passwordMode, setPasswordMode] = useState<'set' | 'change' | 'idle'>(
-		hasPassword ? 'change' : 'set',
-	);
 
 	const [unlinkingGoogle, setUnlinkingGoogle] = useState(false);
+
+	useEffect(() => {
+		if (me) {
+			setUser(me);
+		}
+	}, [me, setUser]);
+
+	const openEditing = () => {
+		setName(me?.name ?? user?.name ?? '');
+		setSurname(me?.surname ?? '');
+		setPhone(me?.phone ?? '');
+		setNeighborhood(me?.neighborhood ?? '');
+		setCity(me?.city ?? 'Luanda');
+		setEditing(true);
+	};
+
+	const refreshMe = () => {
+		void qc.invalidateQueries({ queryKey: ['me'] });
+	};
 
 	const handleChangeEmail = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -95,6 +113,7 @@ export function PerfilPage() {
 			setCurrentPassword('');
 			setNewPassword('');
 			setConfirmPassword('');
+			refreshMe();
 		} catch (error) {
 			toast.error(getApiError(error));
 		} finally {
@@ -110,6 +129,7 @@ export function PerfilPage() {
 		try {
 			await linkGoogleWithIdToken(credential);
 			toast.success('Conta Google vinculada com sucesso!');
+			refreshMe();
 		} catch (error) {
 			toast.error(getApiError(error));
 		}
@@ -122,6 +142,7 @@ export function PerfilPage() {
 		try {
 			await unlinkGoogle(linkedGoogle.id);
 			toast.success('Conta Google desvinculada.');
+			refreshMe();
 		} catch (error) {
 			toast.error(getApiError(error));
 		} finally {
@@ -139,7 +160,7 @@ export function PerfilPage() {
 		e.preventDefault();
 		setSaving(true);
 		try {
-			await updateProfile({
+			const updated = await updateProfile({
 				name,
 				surname,
 				phone: phone || undefined,
@@ -147,6 +168,8 @@ export function PerfilPage() {
 				city: city || undefined,
 			});
 			toast.success('Perfil atualizado!');
+			setUser(updated);
+			refreshMe();
 			setEditing(false);
 		} catch (error) {
 			toast.error(getApiError(error));
@@ -190,21 +213,17 @@ export function PerfilPage() {
 					<div className="mt-3 flex flex-wrap items-center justify-center gap-4 text-sm sm:justify-start">
 						{profile?.phone && (
 							<span className="inline-flex items-center gap-1.5 text-muted">
-								<FaPhone className="h-3.5 w-3.5" />
+								<FaPhone
+									className="h-3.5 w-3.5"
+									style={{ transform: 'rotate(180deg)' }}
+								/>
 								{profile.phone}
-							</span>
-						)}
-						{typeof profile?.trustScore === 'number' && (
-							<span className="inline-flex items-center gap-1.5 text-muted">
-								<FaStar className="h-3.5 w-3.5 text-amber-400" />
-								Confiança{' '}
-								{formatKz(Math.round(profile.trustScore))}
 							</span>
 						)}
 					</div>
 				</div>
 				{!editing && (
-					<Button variant="outline" onClick={() => setEditing(true)}>
+					<Button variant="outline" onClick={openEditing}>
 						Editar perfil
 					</Button>
 				)}
@@ -224,7 +243,7 @@ export function PerfilPage() {
 								required
 							/>
 							<Input
-								label="Apelido"
+								label="Sobrenome"
 								value={surname}
 								onChange={(e) =>
 									setSurname(e.target.value.slice(0, 120))
@@ -321,23 +340,11 @@ export function PerfilPage() {
 						<h3 className="mb-3 text-sm font-semibold text-slate-800">
 							Senha
 						</h3>
-						<div className="mb-3 flex gap-2 text-sm">
-							<button
-								type="button"
-								onClick={() =>
-									setPasswordMode(
-										passwordMode === 'set'
-											? 'change'
-											: 'set',
-									)
-								}
-								className="font-medium text-primary-600 hover:underline"
-							>
-								{hasPassword
-									? 'Alterar senha'
-									: 'Definir senha'}
-							</button>
-						</div>
+						<p className="mb-3 text-sm text-muted">
+							{hasPassword
+								? 'Atualize a senha da sua conta.'
+								: 'Ainda não definiu uma senha. Crie uma para entrar com email e senha.'}
+						</p>
 						<form
 							onSubmit={handlePasswordSubmit}
 							className="grid gap-3 sm:grid-cols-2"
@@ -400,8 +407,7 @@ export function PerfilPage() {
 						{linkedGoogle ? (
 							<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 								<p className="text-sm text-muted">
-									A sua conta Google está vinculada (
-									{linkedGoogle.accountId}).
+									A sua conta Google está vinculada.
 								</p>
 								<Button
 									variant="outline"

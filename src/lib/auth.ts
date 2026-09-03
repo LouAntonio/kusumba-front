@@ -1,24 +1,10 @@
 import { api } from './axios';
+import type { User } from './types';
 
-export interface SessionUser {
-	id: string;
-	name: string;
-	surname: string;
-	email: string;
-	emailVerified: boolean;
-	image?: string;
-	role: string;
-	banned: boolean;
-	subscriptionTier?: string;
-	isVerified?: boolean;
-	trustScore?: number;
-	neighborhood?: string;
-	city?: string;
-	phone?: string;
-}
+export type SessionUser = User;
 
 export interface GetSessionResponse {
-	user: SessionUser;
+	user: User;
 	session: { id: string; createdAt: string; expiresAt: string };
 }
 

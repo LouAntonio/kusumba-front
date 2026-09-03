@@ -73,6 +73,7 @@ export interface User {
 		accountId: string;
 	}[];
 	hasPassword?: boolean;
+	kyc?: { status: KYCStatus } | null;
 }
 
 export interface Category {
