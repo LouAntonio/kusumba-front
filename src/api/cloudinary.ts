@@ -15,8 +15,13 @@ export interface UploadResult {
 	cloudinaryId: string;
 }
 
-export async function getSignedParams(): Promise<SignedParams> {
-	const { data } = await api.get<SignedParams>('/api/uploads/sign');
+export async function getSignedParams(options?: {
+	folder?: string;
+	publicId?: string;
+}): Promise<SignedParams> {
+	const { data } = await api.get<SignedParams>('/api/uploads/sign', {
+		params: options,
+	});
 	return data;
 }
 
@@ -24,17 +29,20 @@ export async function uploadImage(
 	file: File | Blob,
 	options?: { folder?: string; publicId?: string },
 ): Promise<UploadResult> {
-	const signed = await getSignedParams();
+	const signed = await getSignedParams({
+		folder: options?.folder,
+		publicId: options?.publicId,
+	});
 	const form = new FormData();
 	form.append('file', file);
 	form.append('api_key', signed.apiKey);
 	form.append('timestamp', String(signed.timestamp));
 	form.append('signature', signed.signature);
-	if (signed.folder ?? options?.folder) {
-		form.append('folder', signed.folder ?? options?.folder ?? '');
+	if (signed.folder) {
+		form.append('folder', signed.folder);
 	}
-	if (signed.publicId ?? options?.publicId) {
-		form.append('public_id', signed.publicId ?? options?.publicId ?? '');
+	if (signed.publicId) {
+		form.append('public_id', signed.publicId);
 	}
 
 	const endpoint = `https://api.cloudinary.com/v1_1/${signed.cloudName}/image/upload`;

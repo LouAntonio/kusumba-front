@@ -1,16 +1,17 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { FaPlus, FaTimes } from 'react-icons/fa';
 import { useCreateAd, useUpdateAd } from '../../hooks/useAds';
 import { useCategories } from '../../hooks/useCategories';
+import { uploadImage } from '../../api/cloudinary';
 import { getApiError } from '../../lib/axios';
 import type { Ad, AdType, GalleryItem } from '../../lib/types';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
 import { Textarea } from '../ui/Textarea';
-import { ImageUploader } from './ImageUploader';
+import { ImageUploader, type ImageUploaderHandle } from './ImageUploader';
 
 const TYPE_OPTIONS = [
 	{ value: 'SALE', label: 'Venda' },
@@ -47,6 +48,7 @@ export function AdForm({
 		initial?.gallery ?? [],
 	);
 	const [submitting, setSubmitting] = useState(false);
+	const imageUploaderRef = useRef<ImageUploaderHandle>(null);
 
 	const addTrade = () => {
 		const v = tradeInput.trim();
@@ -80,7 +82,32 @@ export function AdForm({
 			toast.error('Informe ao menos um item que aceita para troca.');
 			return;
 		}
+		const pendingFiles = imageUploaderRef.current?.getPendingFiles() ?? [];
+		const slots = 6 - gallery.length;
+		const filesToUpload = pendingFiles.slice(0, Math.max(0, slots));
 		setSubmitting(true);
+		let uploaded: GalleryItem[] = [];
+		if (filesToUpload.length > 0) {
+			try {
+				const results: GalleryItem[] = [];
+				for (const file of filesToUpload) {
+					const uploadedItem = await uploadImage(file, {
+						folder: 'ads',
+					});
+					results.push({
+						url: uploadedItem.url,
+						cloudinaryId: uploadedItem.cloudinaryId,
+						type: 'image',
+					});
+				}
+				uploaded = results;
+			} catch (error) {
+				toast.error(getApiError(error));
+				setSubmitting(false);
+				return;
+			}
+		}
+		const finalGallery = [...gallery, ...uploaded];
 		const input = {
 			title,
 			description,
@@ -93,9 +120,9 @@ export function AdForm({
 						: undefined,
 			tradefor: type === 'TRADE' ? tradefor : undefined,
 			categoryIds,
-			gallery: gallery.length ? gallery : undefined,
-			image: gallery[0]?.url,
-			imageId: gallery[0]?.cloudinaryId,
+			gallery: finalGallery.length ? finalGallery : undefined,
+			image: finalGallery[0]?.url,
+			imageId: finalGallery[0]?.cloudinaryId,
 		};
 		try {
 			if (initial) {
@@ -242,6 +269,7 @@ export function AdForm({
 				</div>
 
 				<ImageUploader
+					ref={imageUploaderRef}
 					images={gallery}
 					onChange={setGallery}
 					max={6}

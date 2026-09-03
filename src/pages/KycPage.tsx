@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import {
@@ -15,10 +15,8 @@ import { getApiError } from '../lib/axios';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
-import { LoadingScreen, Spinner } from '../components/ui/Spinner';
+import { LoadingScreen } from '../components/ui/Spinner';
 import type { KYCStatus } from '../lib/types';
-
-type DocUpload = { url: string; cloudinaryId: string } | null;
 
 const STATUS_LABEL: Record<KYCStatus, string> = {
 	PENDING: 'Em análise',
@@ -26,53 +24,48 @@ const STATUS_LABEL: Record<KYCStatus, string> = {
 	REJECTED: 'Rejeitado',
 };
 
+function useObjectUrl(file: File | null): string | null {
+	return useMemo(() => (file ? URL.createObjectURL(file) : null), [file]);
+}
+
 export function KycPage() {
 	const qc = useQueryClient();
 	const { data: kyc, isLoading } = useMyKyc();
-	const [front, setFront] = useState<DocUpload>(null);
-	const [back, setBack] = useState<DocUpload>(null);
-	const [uploading, setUploading] = useState<'front' | 'back' | null>(null);
+	const [frontFile, setFrontFile] = useState<File | null>(null);
+	const [backFile, setBackFile] = useState<File | null>(null);
+	const [uploading, setUploading] = useState(false);
 	const [submitting, setSubmitting] = useState(false);
+
+	const frontUrl = useObjectUrl(frontFile);
+	const backUrl = useObjectUrl(backFile);
+
+	useEffect(() => {
+		return () => {
+			if (frontUrl) {
+				URL.revokeObjectURL(frontUrl);
+			}
+			if (backUrl) {
+				URL.revokeObjectURL(backUrl);
+			}
+		};
+	}, [frontUrl, backUrl]);
 
 	if (isLoading) {
 		return <LoadingScreen label="A verificar…" />;
 	}
 
-	const handleUpload = async (
-		file: File | undefined,
-		side: 'front' | 'back',
-	) => {
-		if (!file) {
-			return;
-		}
-		setUploading(side);
-		try {
-			const uploaded = await uploadImage(file, { folder: 'kyc' });
-			if (side === 'front') {
-				setFront({
-					url: uploaded.url,
-					cloudinaryId: uploaded.cloudinaryId,
-				});
-			} else {
-				setBack({
-					url: uploaded.url,
-					cloudinaryId: uploaded.cloudinaryId,
-				});
-			}
-		} catch (error) {
-			toast.error(getApiError(error));
-		} finally {
-			setUploading(null);
-		}
-	};
-
 	const handleSubmit = async () => {
-		if (!front || !back) {
+		if (!frontFile || !backFile) {
 			toast.error('Envie a frente e o verso do seu BI.');
 			return;
 		}
 		setSubmitting(true);
+		setUploading(true);
 		try {
+			const [front, back] = await Promise.all([
+				uploadImage(frontFile, { folder: 'kyc' }),
+				uploadImage(backFile, { folder: 'kyc' }),
+			]);
 			await submitKyc({
 				biFrontUrl: front.url,
 				biFrontId: front.cloudinaryId,
@@ -85,6 +78,7 @@ export function KycPage() {
 		} catch (error) {
 			toast.error(getApiError(error));
 		} finally {
+			setUploading(false);
 			setSubmitting(false);
 		}
 	};
@@ -158,24 +152,28 @@ export function KycPage() {
 					<div className="grid gap-4 sm:grid-cols-2">
 						<DocField
 							label="Frente do BI"
-							doc={front}
-							uploading={uploading === 'front'}
-							onPick={(f) => handleUpload(f, 'front')}
+							file={frontFile}
+							previewUrl={frontUrl}
+							onPick={setFrontFile}
 						/>
 						<DocField
 							label="Verso do BI"
-							doc={back}
-							uploading={uploading === 'back'}
-							onPick={(f) => handleUpload(f, 'back')}
+							file={backFile}
+							previewUrl={backUrl}
+							onPick={setBackFile}
 						/>
 					</div>
 
 					<div className="flex justify-end border-t border-slate-200 pt-4">
 						<Button
 							onClick={handleSubmit}
-							disabled={submitting || !front || !back}
+							disabled={submitting || !frontFile || !backFile}
 						>
-							{submitting ? 'A submeter…' : 'Submeter'}
+							{submitting
+								? uploading
+									? 'A enviar…'
+									: 'A submeter…'
+								: 'Submeter'}
 						</Button>
 					</div>
 				</Card>
@@ -196,24 +194,22 @@ export function KycPage() {
 
 function DocField({
 	label,
-	doc,
-	uploading,
+	file,
+	previewUrl,
 	onPick,
 }: {
 	label: string;
-	doc: DocUpload;
-	uploading: boolean;
-	onPick: (file: File | undefined) => void;
+	file: File | null;
+	previewUrl: string | null;
+	onPick: (file: File | null) => void;
 }) {
 	return (
 		<div className="space-y-2">
 			<span className="text-sm font-medium text-slate-700">{label}</span>
 			<label className="flex h-40 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-slate-300 text-muted transition hover:border-primary-400 hover:text-primary-600">
-				{uploading ? (
-					<Spinner />
-				) : doc ? (
+				{file && previewUrl ? (
 					<img
-						src={doc.url}
+						src={previewUrl}
 						alt=""
 						className="h-full w-full object-cover"
 					/>
@@ -227,8 +223,10 @@ function DocField({
 					type="file"
 					accept="image/*"
 					className="hidden"
-					onChange={(e) => onPick(e.target.files?.[0])}
-					disabled={uploading}
+					onChange={(e) => {
+						onPick(e.target.files?.[0] ?? null);
+						e.target.value = '';
+					}}
 				/>
 			</label>
 		</div>
