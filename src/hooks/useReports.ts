@@ -1,5 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { listReports, updateReportStatus } from '../api/reports';
+import {
+	listMyReports,
+	listReports,
+	updateReportStatus,
+} from '../api/reports';
 import type { ReportStatus, ReportTarget } from '../lib/types';
 
 export function useReports(params?: {
@@ -11,6 +15,17 @@ export function useReports(params?: {
 	return useQuery({
 		queryKey: ['reports', params],
 		queryFn: () => listReports(params),
+	});
+}
+
+export function useMyReports(params?: {
+	status?: ReportStatus;
+	page?: number;
+	limit?: number;
+}) {
+	return useQuery({
+		queryKey: ['reports', 'mine', params],
+		queryFn: () => listMyReports(params),
 	});
 }
 

@@ -7,6 +7,16 @@ import { useAuthStore } from '../../store/authStore';
 
 export function GoogleOneTap() {
 	const user = useAuthStore((s) => s.user);
+	const loading = useAuthStore((s) => s.loading);
+
+	if (user || loading) {
+		return null;
+	}
+
+	return <GoogleOneTapPrompt />;
+}
+
+function GoogleOneTapPrompt() {
 	const setUser = useAuthStore((s) => s.setUser);
 	const navigate = useNavigate();
 
@@ -30,7 +40,6 @@ export function GoogleOneTap() {
 		onError: () => toast.error('Não foi possível entrar com o Google.'),
 		cancel_on_tap_outside: true,
 		auto_select: false,
-		disabled: !!user,
 	});
 
 	return null;

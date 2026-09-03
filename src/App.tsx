@@ -14,6 +14,7 @@ import { MagicCallbackPage } from './pages/MagicCallbackPage';
 import { PerfilPage } from './pages/PerfilPage';
 import { MeusAnunciosPage } from './pages/MeusAnunciosPage';
 import { FavoritosPage } from './pages/FavoritosPage';
+import { MinhasDenunciasPage } from './pages/MinhasDenunciasPage';
 import { KycPage } from './pages/KycPage';
 import { MensagensPage } from './pages/MensagensPage';
 import { ConversaPage } from './pages/ConversaPage';
@@ -72,6 +73,14 @@ const router = createBrowserRouter([
 				element: (
 					<RequireAuth>
 						<FavoritosPage />
+					</RequireAuth>
+				),
+			},
+			{
+				path: '/perfil/denuncias',
+				element: (
+					<RequireAuth>
+						<MinhasDenunciasPage />
 					</RequireAuth>
 				),
 			},

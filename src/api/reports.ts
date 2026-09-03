@@ -39,6 +39,17 @@ export async function listReports(params?: {
 	return data;
 }
 
+export async function listMyReports(params?: {
+	status?: ReportStatus;
+	page?: number;
+	limit?: number;
+}): Promise<Paginated<Report>> {
+	const { data } = await api.get<Paginated<Report>>('/api/reports/mine', {
+		params,
+	});
+	return data;
+}
+
 export async function updateReportStatus(
 	id: string,
 	status: ReportStatus,

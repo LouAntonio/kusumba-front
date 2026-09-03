@@ -160,3 +160,35 @@ export async function unlinkGoogle(
 	);
 	return data;
 }
+
+export interface SessionInfo {
+	id: string;
+	token: string;
+	userId: string;
+	ipAddress?: string | null;
+	userAgent?: string | null;
+	createdAt: string;
+	expiresAt: string;
+}
+
+export async function listSessions(): Promise<SessionInfo[]> {
+	const { data } = await api.get<{ sessions: SessionInfo[] }>(
+		'/api/auth/list-sessions',
+	);
+	return data.sessions;
+}
+
+export async function revokeSession(token: string): Promise<{ status: boolean }> {
+	const { data } = await api.post<{ status: boolean }>(
+		'/api/auth/revoke-session',
+		{ token },
+	);
+	return data;
+}
+
+export async function revokeOtherSessions(): Promise<{ status: boolean }> {
+	const { data } = await api.post<{ status: boolean }>(
+		'/api/auth/revoke-other-sessions',
+	);
+	return data;
+}

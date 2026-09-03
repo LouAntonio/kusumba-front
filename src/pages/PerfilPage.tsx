@@ -215,7 +215,7 @@ export function PerfilPage() {
 							<span className="inline-flex items-center gap-1.5 text-muted">
 								<FaPhone
 									className="h-3.5 w-3.5"
-									style={{ transform: 'rotate(180deg)' }}
+									style={{ transform: 'rotate(100deg)' }}
 								/>
 								{profile.phone}
 							</span>

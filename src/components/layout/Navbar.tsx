@@ -206,12 +206,21 @@ function ProfileMenuItems({ onClose }: { onClose: () => void }) {
 				Minha assinatura
 			</Link>
 			<Link
-				to="/denuncias"
+				to="/perfil/denuncias"
 				onClick={onClose}
 				className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
 			>
 				Minhas denúncias
 			</Link>
+			{(user.role === 'ADMIN' || user.role === 'MODERATOR') && (
+				<Link
+					to="/denuncias"
+					onClick={onClose}
+					className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+				>
+					Moderação
+				</Link>
+			)}
 			<div className="border-t border-slate-100 py-1">
 				<button
 					onClick={handleSignOut}
