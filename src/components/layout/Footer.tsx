@@ -9,7 +9,7 @@ export function Footer() {
 					<Logo />
 					<p className="max-w-xs text-sm text-muted">
 						Comprar. Vender. Trocar. Doar. MarketPlace P2P
-						hiperlocal — entre vizinhos, sem frete e com confiança.
+						hiperlocal - entre vizinhos, sem frete e com confiança.
 					</p>
 				</div>
 				<div>
@@ -78,9 +78,20 @@ export function Footer() {
 				</div>
 			</div>
 			<div className="border-t border-slate-200 py-4">
-				<p className="mx-auto max-w-6xl px-4 text-center text-xs text-muted sm:px-6">
-					© {new Date().getFullYear()} Kusumba. Luanda, Angola.
-				</p>
+				<div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-1 px-4 text-center text-xs text-muted sm:flex-row sm:px-6">
+					<p>© {new Date().getFullYear()} Kusumba. Luanda, Angola.</p>
+					<p>
+						Desenvolvido por{' '}
+						<a
+							href="https://louantonio-me.vercel.app"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="font-medium text-primary-600 hover:underline"
+						>
+							Lourenço António
+						</a>
+					</p>
+				</div>
 			</div>
 		</footer>
 	);

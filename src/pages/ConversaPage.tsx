@@ -108,7 +108,7 @@ export function ConversaPage() {
 	const otherOnline = other && (other.id === myId ? false : presence?.online);
 
 	return (
-		<div className="mx-auto flex h-[calc(100vh-8rem)] max-w-3xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white">
+		<div className="mx-auto flex h-[calc(100vh-8rem)] max-w-6xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white">
 			<div className="flex items-center gap-3 border-b border-slate-200 bg-slate-50 px-4 py-3">
 				<Link
 					to="/mensagens"

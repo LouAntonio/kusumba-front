@@ -73,7 +73,7 @@ export function AdCard({
 								{formatKz(ad.price)}
 							</span>
 						) : (
-							<span className="text-base">—</span>
+							<span className="text-base">-</span>
 						)}
 						{timeAgo(ad.createdAt) && (
 							<span className="text-xs text-muted">

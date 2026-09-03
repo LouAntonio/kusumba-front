@@ -25,7 +25,7 @@ export function CreateAdPage() {
 	const verified = me?.kyc?.status === 'APPROVED';
 
 	return (
-		<div className="mx-auto max-w-2xl space-y-6">
+		<div className="mx-auto max-w-6xl space-y-6">
 			<div>
 				<h1 className="font-display text-2xl">Criar anúncio</h1>
 				<p className="text-sm text-muted">

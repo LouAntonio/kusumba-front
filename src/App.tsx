@@ -1,6 +1,7 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { AppLayout } from './components/layout/AppLayout';
 import { RequireAuth } from './components/layout/RequireAuth';
+import { RequireGuest } from './components/layout/RequireGuest';
 import { LandingPage } from './pages/LandingPage';
 import { AdsListPage } from './pages/AdsListPage';
 import { AdDetailPage } from './pages/AdDetailPage';
@@ -47,10 +48,38 @@ const router = createBrowserRouter([
 					</RequireAuth>
 				),
 			},
-			{ path: '/entrar', element: <LoginPage /> },
-			{ path: '/registar', element: <RegisterPage /> },
-			{ path: '/esqueci-a-senha', element: <ForgotPasswordPage /> },
-			{ path: '/redefinir-senha', element: <ResetPasswordPage /> },
+			{
+				path: '/entrar',
+				element: (
+					<RequireGuest>
+						<LoginPage />
+					</RequireGuest>
+				),
+			},
+			{
+				path: '/registar',
+				element: (
+					<RequireGuest>
+						<RegisterPage />
+					</RequireGuest>
+				),
+			},
+			{
+				path: '/esqueci-a-senha',
+				element: (
+					<RequireGuest>
+						<ForgotPasswordPage />
+					</RequireGuest>
+				),
+			},
+			{
+				path: '/redefinir-senha',
+				element: (
+					<RequireGuest>
+						<ResetPasswordPage />
+					</RequireGuest>
+				),
+			},
 			{ path: '/auth/magic', element: <MagicCallbackPage /> },
 			{
 				path: '/perfil',

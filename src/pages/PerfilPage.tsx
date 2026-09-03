@@ -180,7 +180,7 @@ export function PerfilPage() {
 	};
 
 	return (
-		<div className="mx-auto max-w-3xl space-y-6">
+		<div className="mx-auto max-w-6xl space-y-6">
 			<div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start">
 				<Avatar
 					image={profile?.image}

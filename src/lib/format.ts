@@ -7,21 +7,21 @@ const currencyFormatter = new Intl.NumberFormat('pt-AO', {
 
 export function formatCurrency(value: number | null | undefined): string {
 	if (value === null || value === undefined) {
-		return '—';
+		return '-';
 	}
 	return currencyFormatter.format(value);
 }
 
 export function formatKz(value: number | null | undefined): string {
 	if (value === null || value === undefined) {
-		return '—';
+		return '-';
 	}
 	return `${new Intl.NumberFormat('pt-AO').format(value)} Kz`;
 }
 
 export function formatDate(iso: string | null | undefined): string {
 	if (!iso) {
-		return '—';
+		return '-';
 	}
 	return new Intl.DateTimeFormat('pt-AO', {
 		day: '2-digit',

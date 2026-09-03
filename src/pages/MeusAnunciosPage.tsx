@@ -150,7 +150,7 @@ export function MeusAnunciosPage() {
 										? 'Doação'
 										: ad.price != null
 											? formatKz(ad.price)
-											: '—'}
+											: '-'}
 								</p>
 							</div>
 							<div className="flex flex-wrap gap-2">

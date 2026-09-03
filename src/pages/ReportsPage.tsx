@@ -36,7 +36,7 @@ export function ReportsPage() {
 
 	if (!isModerator) {
 		return (
-			<div className="mx-auto max-w-xl py-16 text-center">
+			<div className="mx-auto max-w-6xl py-16 text-center">
 				<FaShieldAlt className="mx-auto mb-3 h-10 w-10 text-muted" />
 				<h1 className="font-display text-xl">Acesso restrito</h1>
 				<p className="mt-2 text-sm text-muted">

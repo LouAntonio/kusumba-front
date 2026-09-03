@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
 	FaHeart,
 	FaCommentDots,
@@ -8,6 +8,7 @@ import {
 	FaBars,
 	FaSearch,
 	FaSignOutAlt,
+	FaTimes,
 } from 'react-icons/fa';
 import { useAuthStore } from '../../store/authStore';
 import { signOut } from '../../lib/auth';
@@ -20,6 +21,17 @@ export function Navbar() {
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [mobileOpen, setMobileOpen] = useState(false);
 	const navigate = useNavigate();
+	const [params] = useSearchParams();
+	const initialQuery = params.get('q') ?? '';
+	const [query, setQuery] = useState(initialQuery);
+
+	const submitSearch = (q: string) => {
+		navigate(
+			q.trim()
+				? `/procurar?q=${encodeURIComponent(q.trim())}`
+				: '/anuncios',
+		);
+	};
 
 	return (
 		<header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
@@ -28,27 +40,13 @@ export function Navbar() {
 					<Logo />
 				</Link>
 
-				<form
-					className="hidden flex-1 sm:flex"
-					onSubmit={(e) => {
-						e.preventDefault();
-						const q = (
-							e.currentTarget.elements.namedItem(
-								'q',
-							) as HTMLInputElement
-						)?.value;
-						navigate(q ? `/procurar?q=${q}` : '/anuncios');
-					}}
-				>
-					<div className="relative w-full max-w-md">
-						<FaSearch className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted" />
-						<input
-							name="q"
-							placeholder="Procurar entre vizinhos…"
-							className="h-10 w-full rounded-full border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm"
-						/>
-					</div>
-				</form>
+				<div className="hidden flex-1 sm:flex">
+					<SearchField
+						value={query}
+						onChange={setQuery}
+						onSubmit={submitSearch}
+					/>
+				</div>
 
 				<nav className="ml-auto hidden items-center gap-1 md:flex">
 					<Link
@@ -138,7 +136,7 @@ function ProfileMenuItems({ onClose }: { onClose: () => void }) {
 		try {
 			await signOut();
 		} catch {
-			// ignore — clear local session regardless
+			// ignore - clear local session regardless
 		}
 		clear();
 		navigate('/');
@@ -243,13 +241,14 @@ function MobileMenuItems({
 	const clear = useAuthStore((s) => s.clear);
 	const navigate = useNavigate();
 	const [signingOut, setSigningOut] = useState(false);
+	const [mobileQuery, setMobileQuery] = useState('');
 
 	const handleSignOut = async () => {
 		setSigningOut(true);
 		try {
 			await signOut();
 		} catch {
-			// ignore — clear local session regardless
+			// ignore - clear local session regardless
 		}
 		clear();
 		navigate('/');
@@ -257,6 +256,17 @@ function MobileMenuItems({
 
 	return (
 		<nav className="flex flex-col gap-1">
+			<SearchField
+				value={mobileQuery}
+				onChange={setMobileQuery}
+				onSubmit={(q) => {
+					navigate(
+						q.trim()
+							? `/procurar?q=${encodeURIComponent(q.trim())}`
+							: '/anuncios',
+					);
+				}}
+			/>
 			<Link
 				to="/anuncios"
 				className="rounded-lg bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
@@ -301,5 +311,46 @@ function MobileMenuItems({
 				</Link>
 			)}
 		</nav>
+	);
+}
+
+function SearchField({
+	value,
+	onChange,
+	onSubmit,
+}: {
+	value: string;
+	onChange: (value: string) => void;
+	onSubmit: (value: string) => void;
+}) {
+	return (
+		<form
+			className="relative w-full max-w-md"
+			onSubmit={(e) => {
+				e.preventDefault();
+				onSubmit(value);
+			}}
+			role="search"
+		>
+			<FaSearch className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
+			<input
+				name="q"
+				value={value}
+				onChange={(e) => onChange(e.target.value)}
+				placeholder="Procurar entre vizinhos…"
+				aria-label="Procurar anúncios"
+				className="h-10 w-full rounded-full border border-slate-200 bg-slate-50 pl-10 pr-10 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-primary-400 focus:bg-white focus:ring-2 focus:ring-primary-100"
+			/>
+			{value && (
+				<button
+					type="button"
+					onClick={() => onChange('')}
+					aria-label="Limpar pesquisa"
+					className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+				>
+					<FaTimes className="h-3.5 w-3.5" />
+				</button>
+			)}
+		</form>
 	);
 }

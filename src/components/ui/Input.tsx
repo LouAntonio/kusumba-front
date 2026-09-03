@@ -11,7 +11,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 	({ label, error, className, id, type, ...props }, ref) => {
 		const inputId = id ?? label?.toLowerCase().replace(/\s+/g, '-');
 		const isPassword = type === 'password';
-		const [showPassword, setShowPassword] = useState(isPassword);
+		const [showPassword, setShowPassword] = useState(false);
 
 		const input = (
 			<input

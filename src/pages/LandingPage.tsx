@@ -93,7 +93,7 @@ export function LandingPage() {
 							</span>
 						</h1>
 						<p className="max-w-md text-lg text-slate-600">
-							O marketPlace P2P hiperlocal de Luanda — sem frete,
+							O marketPlace P2P hiperlocal de Luanda - sem frete,
 							com confiança comunitária e transações em horas.
 						</p>
 						<div className="flex flex-wrap gap-3">

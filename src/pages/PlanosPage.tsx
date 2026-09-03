@@ -32,7 +32,7 @@ export function PlanosPage() {
 
 	return (
 		<div className="space-y-8">
-			<div className="mx-auto max-w-2xl text-center">
+			<div className="mx-auto max-w-6xl text-center">
 				<div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-accent/15 text-accent">
 					<FaCrown className="h-6 w-6" />
 				</div>

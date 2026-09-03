@@ -35,7 +35,7 @@ export function SubscriptionPage() {
 	}
 
 	return (
-		<div className="mx-auto max-w-xl space-y-6">
+		<div className="mx-auto max-w-6xl space-y-6">
 			<div className="text-center">
 				<div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-accent/15 text-accent">
 					<FaCrown className="h-6 w-6" />

@@ -176,7 +176,7 @@ export function AdDetailPage() {
 									{formatKz(ad.price)}
 								</p>
 							) : (
-								<p className="text-xl">—</p>
+								<p className="text-xl">-</p>
 							)}
 							{ad.featured && (
 								<p className="mt-1 text-xs font-medium text-accent-dark">
