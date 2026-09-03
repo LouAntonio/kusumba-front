@@ -1,9 +1,13 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import toast from 'react-hot-toast';
 import { FaEnvelope } from 'react-icons/fa';
-import { requestMagicLink, signInWithGoogleIdToken } from '../lib/auth';
+import {
+	requestMagicLink,
+	signInEmail,
+	signInWithGoogleIdToken,
+} from '../lib/auth';
 import { getApiError } from '../lib/axios';
 import { useAuthStore } from '../store/authStore';
 import { Button } from '../components/ui/Button';
@@ -14,8 +18,25 @@ export function LoginPage() {
 	const navigate = useNavigate();
 	const setUser = useAuthStore((s) => s.setUser);
 	const [email, setEmail] = useState('');
+	const [password, setPassword] = useState('');
+	const [mode, setMode] = useState<'password' | 'magic'>('password');
 	const [sending, setSending] = useState(false);
 	const [sent, setSent] = useState(false);
+
+	const handlePasswordLogin = async (e: React.FormEvent) => {
+		e.preventDefault();
+		setSending(true);
+		try {
+			const session = await signInEmail(email, password);
+			setUser(session?.user ?? null);
+			toast.success(`Bem-vindo, ${session?.user?.name}!`);
+			navigate('/anuncios');
+		} catch (error) {
+			toast.error(getApiError(error));
+		} finally {
+			setSending(false);
+		}
+	};
 
 	const handleMagicLink = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -61,7 +82,7 @@ export function LoginPage() {
 			<div className="w-full rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
 				{!sent ? (
 					<>
-						<div className="mb-4 w-full">
+						<div className="mb-4 flex w-full justify-center">
 							<GoogleLogin
 								onSuccess={(res) =>
 									handleGoogleSuccess(res.credential)
@@ -84,30 +105,88 @@ export function LoginPage() {
 							<span className="h-px flex-1 bg-slate-200" />
 						</div>
 
-						<form
-							onSubmit={handleMagicLink}
-							className="flex flex-col gap-4"
-						>
-							<Input
-								type="email"
-								label="Email"
-								value={email}
-								onChange={(e) => setEmail(e.target.value)}
-								placeholder="voce@exemplo.com"
-								required
-							/>
-							<Button
-								type="submit"
-								variant="primary"
-								disabled={sending || !email}
-								fullWidth
+						{mode === 'password' ? (
+							<form
+								onSubmit={handlePasswordLogin}
+								className="flex flex-col gap-4"
 							>
-								<FaEnvelope className="h-4 w-4" />
-								{sending
-									? 'A enviar…'
-									: 'Enviar link de acesso'}
-							</Button>
-						</form>
+								<Input
+									type="email"
+									label="Email"
+									value={email}
+									onChange={(e) => setEmail(e.target.value)}
+									placeholder="voce@exemplo.com"
+									autoComplete="email"
+									required
+								/>
+								<Input
+									type="password"
+									label="Senha"
+									value={password}
+									onChange={(e) =>
+										setPassword(e.target.value)
+									}
+									placeholder="A sua senha"
+									autoComplete="current-password"
+									required
+								/>
+								<Button
+									type="submit"
+									variant="primary"
+									disabled={sending || !email || !password}
+									fullWidth
+								>
+									{sending ? 'A entrar…' : 'Entrar'}
+								</Button>
+								<div className="flex items-center justify-between text-sm">
+									<button
+										type="button"
+										onClick={() => setMode('magic')}
+										className="font-medium text-primary-600 hover:underline"
+									>
+										Entrar com link de email
+									</button>
+									<Link
+										to="/esqueci-a-senha"
+										className="font-medium text-primary-600 hover:underline"
+									>
+										Esqueceu a senha?
+									</Link>
+								</div>
+							</form>
+						) : (
+							<form
+								onSubmit={handleMagicLink}
+								className="flex flex-col gap-4"
+							>
+								<Input
+									type="email"
+									label="Email"
+									value={email}
+									onChange={(e) => setEmail(e.target.value)}
+									placeholder="voce@exemplo.com"
+									required
+								/>
+								<Button
+									type="submit"
+									variant="primary"
+									disabled={sending || !email}
+									fullWidth
+								>
+									<FaEnvelope className="h-4 w-4" />
+									{sending
+										? 'A enviar…'
+										: 'Enviar link de acesso'}
+								</Button>
+								<button
+									type="button"
+									onClick={() => setMode('password')}
+									className="text-sm font-medium text-primary-600 hover:underline"
+								>
+									Entrar com email e senha
+								</button>
+							</form>
+						)}
 					</>
 				) : (
 					<div className="flex flex-col items-center gap-3 py-4 text-center">
@@ -132,6 +211,16 @@ export function LoginPage() {
 					</div>
 				)}
 			</div>
+
+			<p className="text-center text-sm text-muted">
+				Não tem conta?{' '}
+				<Link
+					to="/registar"
+					className="font-medium text-primary-600 hover:underline"
+				>
+					Criar conta
+				</Link>
+			</p>
 
 			<p className="text-center text-xs text-muted">
 				Ao entrar, concorda com os termos de uso e a política de

@@ -70,6 +70,12 @@
 		outline-offset: 2px;
 	}
 
+	input,
+	select,
+	textarea {
+		outline: none;
+	}
+
 	@media (prefers-reduced-motion: reduce) {
 		*,
 		*::before,

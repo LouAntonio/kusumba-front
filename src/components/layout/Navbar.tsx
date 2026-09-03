@@ -7,8 +7,10 @@ import {
 	FaUser,
 	FaBars,
 	FaSearch,
+	FaSignOutAlt,
 } from 'react-icons/fa';
 import { useAuthStore } from '../../store/authStore';
+import { signOut } from '../../lib/auth';
 import { Logo } from './Logo';
 import { Button } from '../ui/Button';
 import { Avatar } from '../ui/Avatar';
@@ -51,7 +53,7 @@ export function Navbar() {
 				<nav className="ml-auto hidden items-center gap-1 md:flex">
 					<Link
 						to="/anuncios"
-						className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+						className="rounded-lg bg-slate-100 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
 					>
 						Explorar
 					</Link>
@@ -126,6 +128,19 @@ export function Navbar() {
 
 function ProfileMenuItems({ onClose }: { onClose: () => void }) {
 	const user = useAuthStore((s) => s.user);
+	const clear = useAuthStore((s) => s.clear);
+	const navigate = useNavigate();
+
+	const handleSignOut = async () => {
+		onClose();
+		try {
+			await signOut();
+		} catch {
+			// ignore — clear local session regardless
+		}
+		clear();
+		navigate('/');
+	};
 	if (!user) {
 		return (
 			<Link
@@ -195,6 +210,15 @@ function ProfileMenuItems({ onClose }: { onClose: () => void }) {
 			>
 				Minhas denúncias
 			</Link>
+			<div className="border-t border-slate-100 py-1">
+				<button
+					onClick={handleSignOut}
+					className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+				>
+					<FaSignOutAlt className="h-4 w-4" />
+					Sair
+				</button>
+			</div>
 		</>
 	);
 }
@@ -204,11 +228,24 @@ function MobileMenuItems({
 }: {
 	user: ReturnType<typeof useAuthStore.getState>['user'];
 }) {
+	const clear = useAuthStore((s) => s.clear);
+	const navigate = useNavigate();
+
+	const handleSignOut = async () => {
+		try {
+			await signOut();
+		} catch {
+			// ignore — clear local session regardless
+		}
+		clear();
+		navigate('/');
+	};
+
 	return (
 		<nav className="flex flex-col gap-1">
 			<Link
 				to="/anuncios"
-				className="rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+				className="rounded-lg bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
 			>
 				Explorar
 			</Link>
@@ -232,6 +269,12 @@ function MobileMenuItems({
 					>
 						<FaUser className="h-4 w-4" /> Meu perfil
 					</Link>
+					<button
+						onClick={handleSignOut}
+						className="flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-red-600 hover:bg-red-50"
+					>
+						<FaSignOutAlt className="h-4 w-4" /> Sair
+					</button>
 				</>
 			) : (
 				<Link

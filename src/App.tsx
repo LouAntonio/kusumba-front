@@ -7,6 +7,10 @@ import { AdDetailPage } from './pages/AdDetailPage';
 import { CreateAdPage } from './pages/CreateAdPage';
 import { EditAdPage } from './pages/EditAdPage';
 import { LoginPage } from './pages/LoginPage';
+import { RegisterPage } from './pages/RegisterPage';
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
+import { ResetPasswordPage } from './pages/ResetPasswordPage';
+import { MagicCallbackPage } from './pages/MagicCallbackPage';
 import { PerfilPage } from './pages/PerfilPage';
 import { MeusAnunciosPage } from './pages/MeusAnunciosPage';
 import { FavoritosPage } from './pages/FavoritosPage';
@@ -43,6 +47,10 @@ const router = createBrowserRouter([
 				),
 			},
 			{ path: '/entrar', element: <LoginPage /> },
+			{ path: '/registar', element: <RegisterPage /> },
+			{ path: '/esqueci-a-senha', element: <ForgotPasswordPage /> },
+			{ path: '/redefinir-senha', element: <ResetPasswordPage /> },
+			{ path: '/auth/magic', element: <MagicCallbackPage /> },
 			{
 				path: '/perfil',
 				element: (

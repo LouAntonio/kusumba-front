@@ -73,3 +73,48 @@ export async function signInWithGoogleIdToken(
 export async function signOut(): Promise<void> {
 	await api.post('/api/auth/sign-out');
 }
+
+export async function signUp(
+	name: string,
+	email: string,
+	password: string,
+): Promise<GetSessionResponse> {
+	const { data } = await api.post<GetSessionResponse>(
+		'/api/auth/sign-up/email',
+		{ name, email, password },
+	);
+	return data;
+}
+
+export async function signInEmail(
+	email: string,
+	password: string,
+): Promise<GetSessionResponse> {
+	const { data } = await api.post<GetSessionResponse>(
+		'/api/auth/sign-in/email',
+		{ email, password },
+	);
+	return data;
+}
+
+export async function forgotPassword(
+	email: string,
+): Promise<{ status: boolean }> {
+	const callbackURL = `${window.location.origin}/redefinir-senha`;
+	const { data } = await api.post<{ status: boolean }>(
+		'/api/auth/forget-password',
+		{ email, callbackURL },
+	);
+	return data;
+}
+
+export async function resetPassword(
+	token: string,
+	newPassword: string,
+): Promise<{ status: boolean }> {
+	const { data } = await api.post<{ status: boolean }>(
+		'/api/auth/reset-password',
+		{ token, newPassword },
+	);
+	return data;
+}
