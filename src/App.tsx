@@ -23,6 +23,10 @@ import { PlanosPage } from './pages/PlanosPage';
 import { SubscriptionPage } from './pages/SubscriptionPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { AboutPage } from './pages/AboutPage';
+import { ContactPage } from './pages/ContactPage';
+import { PoliciesPage } from './pages/PoliciesPage';
+import { TermsPage } from './pages/TermsPage';
 
 const router = createBrowserRouter([
 	{
@@ -138,6 +142,10 @@ const router = createBrowserRouter([
 				),
 			},
 			{ path: '/planos', element: <PlanosPage /> },
+			{ path: '/sobre', element: <AboutPage /> },
+			{ path: '/contacto', element: <ContactPage /> },
+			{ path: '/politicas', element: <PoliciesPage /> },
+			{ path: '/termos', element: <TermsPage /> },
 			{
 				path: '/assinatura',
 				element: (

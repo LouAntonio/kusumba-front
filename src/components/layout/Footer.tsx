@@ -72,9 +72,34 @@ export function Footer() {
 					<h4 className="mb-3 text-sm font-semibold text-slate-800">
 						Sobre
 					</h4>
-					<p className="text-sm text-muted">
-						Feito para a comunidade de Luanda, Angola.
-					</p>
+					<ul className="space-y-2 text-sm text-muted">
+						<li>
+							<Link to="/sobre" className="hover:text-slate-900">
+								Quem somos
+							</Link>
+						</li>
+						<li>
+							<Link
+								to="/contacto"
+								className="hover:text-slate-900"
+							>
+								Contacto
+							</Link>
+						</li>
+						<li>
+							<Link
+								to="/politicas"
+								className="hover:text-slate-900"
+							>
+								Políticas
+							</Link>
+						</li>
+						<li>
+							<Link to="/termos" className="hover:text-slate-900">
+								Termos e Condições
+							</Link>
+						</li>
+					</ul>
 				</div>
 			</div>
 			<div className="border-t border-slate-200 py-4">

@@ -233,7 +233,9 @@ export function KycPage() {
 					<div className="space-y-3">
 						<div className="flex items-center justify-between">
 							<span className="text-sm font-medium text-slate-700">
-								Selfies (mínimo {MIN_SELFIES - 1}) e ao menos uma de corpo inteiro (poderá usar como foto de perfil)
+								Selfies (mínimo {MIN_SELFIES - 1}) e ao menos
+								uma de corpo inteiro (poderá usar como foto de
+								perfil)
 							</span>
 							<span className="text-xs text-muted">
 								{selfieFiles.length}/{MAX_SELFIES}
