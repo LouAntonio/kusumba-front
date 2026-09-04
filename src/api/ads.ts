@@ -33,8 +33,15 @@ export async function listAds(query: AdQuery = {}): Promise<Paginated<Ad>> {
 	return data;
 }
 
+const UUID_RE =
+	/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export async function getAd(idOrSlug: string): Promise<Ad> {
-	const { data } = await api.get<Ad>(`/api/ads/${idOrSlug}`);
+	const isId = UUID_RE.test(idOrSlug);
+	const endpoint = isId
+		? `/api/ads/${idOrSlug}`
+		: `/api/ads/by-slug/${encodeURIComponent(idOrSlug)}`;
+	const { data } = await api.get<Ad>(endpoint);
 	return data;
 }
 

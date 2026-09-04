@@ -88,9 +88,10 @@ export function AdForm({
 		setSubmitting(true);
 		let uploaded: GalleryItem[] = [];
 		if (filesToUpload.length > 0) {
-			try {
-				const results: GalleryItem[] = [];
-				for (const file of filesToUpload) {
+			const results: GalleryItem[] = [];
+			let failures = 0;
+			for (const file of filesToUpload) {
+				try {
 					const uploadedItem = await uploadImage(file, {
 						folder: 'ads',
 					});
@@ -99,12 +100,20 @@ export function AdForm({
 						cloudinaryId: uploadedItem.cloudinaryId,
 						type: 'image',
 					});
+				} catch {
+					failures += 1;
 				}
-				uploaded = results;
-			} catch (error) {
-				toast.error(getApiError(error));
-				setSubmitting(false);
-				return;
+			}
+			uploaded = results;
+			imageUploaderRef.current?.clearPendingFiles();
+			if (failures > 0) {
+				const ok = results.length;
+				const total = filesToUpload.length;
+				toast.error(
+					`${failures} de ${total} imagem(ns) falharam o upload.${
+						ok > 0 ? ' As restantes foram guardadas.' : ''
+					}`,
+				);
 			}
 		}
 		const finalGallery = [...gallery, ...uploaded];

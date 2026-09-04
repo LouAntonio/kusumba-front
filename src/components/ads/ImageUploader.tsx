@@ -2,7 +2,6 @@ import {
 	forwardRef,
 	useEffect,
 	useImperativeHandle,
-	useMemo,
 	useRef,
 	useState,
 } from 'react';
@@ -12,6 +11,20 @@ import { cn } from '../../lib/cn';
 
 export interface ImageUploaderHandle {
 	getPendingFiles: () => File[];
+	clearPendingFiles: () => void;
+}
+
+interface PendingFile {
+	uid: string;
+	file: File;
+	url: string;
+}
+
+function makeUid(): string {
+	if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+		return crypto.randomUUID();
+	}
+	return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
 export const ImageUploader = forwardRef<
@@ -27,42 +40,57 @@ export const ImageUploader = forwardRef<
 	ref,
 ) {
 	const inputRef = useRef<HTMLInputElement>(null);
-	const [pending, setPending] = useState<File[]>([]);
+	const [pending, setPending] = useState<PendingFile[]>([]);
 
 	useImperativeHandle(
 		ref,
 		() => ({
-			getPendingFiles: () => pending,
+			getPendingFiles: () => pending.map((p) => p.file),
+			clearPendingFiles: () => {
+				for (const p of pending) {
+					URL.revokeObjectURL(p.url);
+				}
+				setPending([]);
+			},
 		}),
-		[pending],
-	);
-
-	const previewUrls = useMemo(
-		() =>
-			pending.map((file) => ({
-				file,
-				url: URL.createObjectURL(file),
-			})),
 		[pending],
 	);
 
 	useEffect(() => {
 		return () => {
-			for (const p of previewUrls) {
+			for (const p of pending) {
 				URL.revokeObjectURL(p.url);
 			}
 		};
-	}, [previewUrls]);
+	}, [pending]);
+
+	const removePending = (uid: string) => {
+		setPending((prev) => {
+			const target = prev.find((p) => p.uid === uid);
+			if (target) {
+				URL.revokeObjectURL(target.url);
+			}
+			return prev.filter((p) => p.uid !== uid);
+		});
+	};
 
 	const handleFiles = (files: FileList | null) => {
 		if (!files?.length) {
 			return;
 		}
-		const slots = max - images.length - pending.length;
-		if (slots <= 0) {
-			return;
-		}
-		setPending((prev) => [...prev, ...Array.from(files).slice(0, slots)]);
+		const incoming = Array.from(files);
+		setPending((prev) => {
+			const slots = max - images.length - prev.length;
+			if (slots <= 0) {
+				return prev;
+			}
+			const added = incoming.slice(0, slots).map((file) => ({
+				uid: makeUid(),
+				file,
+				url: URL.createObjectURL(file),
+			}));
+			return [...prev, ...added];
+		});
 		if (inputRef.current) {
 			inputRef.current.value = '';
 		}
@@ -101,23 +129,19 @@ export const ImageUploader = forwardRef<
 						)}
 					</div>
 				))}
-				{pending.map((file, i) => (
+				{pending.map((p) => (
 					<div
-						key={file.name + i}
+						key={p.uid}
 						className="relative h-24 w-24 overflow-hidden rounded-lg border border-dashed border-primary-400"
 					>
 						<img
-							src={previewUrls[i]?.url}
+							src={p.url}
 							alt=""
 							className="h-full w-full object-cover"
 						/>
 						<button
 							type="button"
-							onClick={() =>
-								setPending((prev) =>
-									prev.filter((_, idx) => idx !== i),
-								)
-							}
+							onClick={() => removePending(p.uid)}
 							className="absolute right-1 top-1 rounded-full bg-black/60 p-1 text-white hover:bg-black/80"
 							aria-label="Remover imagem"
 						>
