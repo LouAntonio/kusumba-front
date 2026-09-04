@@ -289,26 +289,80 @@ function MobileMenuItems({
 				<>
 					<Link
 						to="/anuncios/novo"
+						onClick={onClose}
 						className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
 					>
 						<FaPlus className="h-4 w-4" /> Criar anúncio
 					</Link>
 					<Link
 						to="/mensagens"
+						onClick={onClose}
 						className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
 					>
 						<FaCommentDots className="h-4 w-4" /> Mensagens
 					</Link>
 					<Link
 						to="/perfil"
+						onClick={onClose}
 						className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
 					>
 						<FaUser className="h-4 w-4" /> Meu perfil
 					</Link>
+					<Link
+						to="/perfil/anuncios"
+						onClick={onClose}
+						className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+					>
+						<FaBoxOpen className="h-4 w-4" /> Meus anúncios
+					</Link>
+					<Link
+						to="/perfil/favoritos"
+						onClick={onClose}
+						className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+					>
+						<FaHeart className="h-4 w-4" /> Favoritos
+					</Link>
+					<Link
+						to="/perfil/kyc"
+						onClick={onClose}
+						className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+					>
+						<FaShieldAlt className="h-4 w-4" /> Verificação
+					</Link>
+					<Link
+						to="/planos"
+						onClick={onClose}
+						className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+					>
+						<FaCrown className="h-4 w-4" /> Kusumba Pass
+					</Link>
+					<Link
+						to="/assinatura"
+						onClick={onClose}
+						className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+					>
+						<FaCreditCard className="h-4 w-4" /> Minha assinatura
+					</Link>
+					<Link
+						to="/perfil/denuncias"
+						onClick={onClose}
+						className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+					>
+						<FaFlag className="h-4 w-4" /> Minhas denúncias
+					</Link>
+					{(user.role === 'ADMIN' || user.role === 'MODERATOR') && (
+						<Link
+							to="/denuncias"
+							onClick={onClose}
+							className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+						>
+							<FaGavel className="h-4 w-4" /> Moderação
+						</Link>
+					)}
 					<button
 						onClick={handleSignOut}
 						disabled={signingOut}
-						className="flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-60"
+						className="mt-1 flex items-center gap-2 rounded-lg border-t border-slate-100 px-3 py-2 pt-3 text-left text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-60"
 					>
 						<FaSignOutAlt className="h-4 w-4" />{' '}
 						{signingOut ? 'A sair…' : 'Sair'}

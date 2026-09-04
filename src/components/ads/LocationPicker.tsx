@@ -51,8 +51,17 @@ export function LocationPicker({
 			onChange(next);
 		};
 		marker.on('dragend', onDragEnd);
+		const onClick = (e: mapboxgl.MapMouseEvent) => {
+			const next = { lat: e.lngLat.lat, lng: e.lngLat.lng };
+			setLoc(next);
+			onChange(next);
+			marker.setLngLat([next.lng, next.lat]);
+			map.flyTo({ center: [next.lng, next.lat], zoom: 14 });
+		};
+		map.on('click', onClick);
 		return () => {
 			marker.off('dragend', onDragEnd);
+			map.off('click', onClick);
 			map.remove();
 			mapRef.current = null;
 			markerRef.current = null;

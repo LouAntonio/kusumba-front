@@ -48,7 +48,9 @@ export function AdForm({
 	const [gallery, setGallery] = useState<GalleryItem[]>(
 		initial?.gallery ?? [],
 	);
-	const [location, setLocation] = useState<Location | null>(null);
+	const [location, setLocation] = useState<Location | null>(
+		initial?.location ?? null,
+	);
 	const [submitting, setSubmitting] = useState(false);
 	const imageUploaderRef = useRef<ImageUploaderHandle>(null);
 

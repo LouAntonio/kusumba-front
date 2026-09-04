@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import {
@@ -28,12 +28,97 @@ import { AdReviews } from '../components/ads/AdReviews';
 import { AD_TYPE_LABELS, type AdType } from '../lib/types';
 import { formatKz, formatDistance, timeAgo } from '../lib/format';
 
+function distanceMeters(
+	a: { lat: number; lng: number },
+	b: { lat: number; lng: number },
+): number {
+	const R = 6371000;
+	const toRad = (d: number) => (d * Math.PI) / 180;
+	const dLat = toRad(b.lat - a.lat);
+	const dLng = toRad(b.lng - a.lng);
+	const la1 = toRad(a.lat);
+	const la2 = toRad(b.lat);
+	const h =
+		Math.sin(dLat / 2) ** 2 +
+		Math.cos(la1) * Math.cos(la2) * Math.sin(dLng / 2) ** 2;
+	return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+function formatCoords(lat: number, lng: number): string {
+	const latDir = lat >= 0 ? 'N' : 'S';
+	const lngDir = lng >= 0 ? 'E' : 'O';
+	return `${Math.abs(lat).toFixed(3)}°${latDir} · ${Math.abs(lng).toFixed(
+		3,
+	)}°${lngDir}`;
+}
+
+const MAPBOX_TOKEN = (
+	import.meta.env.VITE_MAPBOX_TOKEN as string | undefined
+)?.trim();
+
 export function AdDetailPage() {
 	const { slug } = useParams();
 	const navigate = useNavigate();
 	const user = useAuthStore((s) => s.user);
 	const { data: ad, isLoading, isError } = useAd(slug);
 	const [reportOpen, setReportOpen] = useState(false);
+	const [myCoords, setMyCoords] = useState<{
+		lat: number;
+		lng: number;
+	} | null>(null);
+	const [place, setPlace] = useState<{
+		for: string;
+		value: string | null;
+	} | null>(null);
+	const [geoDenied, setGeoDenied] = useState(false);
+
+	const geoUnsupported = !('geolocation' in navigator);
+
+	useEffect(() => {
+		if (!('geolocation' in navigator)) {
+			return;
+		}
+		navigator.geolocation.getCurrentPosition(
+			(pos) =>
+				setMyCoords({
+					lat: pos.coords.latitude,
+					lng: pos.coords.longitude,
+				}),
+			() => setGeoDenied(true),
+			{ enableHighAccuracy: true, timeout: 10000 },
+		);
+	}, []);
+
+	useEffect(() => {
+		if (!ad?.location || !MAPBOX_TOKEN) {
+			return;
+		}
+		let cancelled = false;
+		const { lat, lng } = ad.location;
+		const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${MAPBOX_TOKEN}&country=ao&limit=1`;
+		fetch(url)
+			.then((res) => (res.ok ? res.json() : Promise.reject()))
+			.then((data) => {
+				if (cancelled) {
+					return;
+				}
+				setPlace({
+					for: ad.id,
+					value:
+						typeof data?.features?.[0]?.place_name === 'string'
+							? (data.features[0].place_name as string)
+							: null,
+				});
+			})
+			.catch(() => {
+				if (!cancelled) {
+					setPlace({ for: ad.id, value: null });
+				}
+			});
+		return () => {
+			cancelled = true;
+		};
+	}, [ad?.id, ad?.location]);
 
 	const { data: wishlistCheck } = useWishlistCheck(ad?.id);
 	const toggleWishlist = useToggleWishlist();
@@ -98,6 +183,11 @@ export function AdDetailPage() {
 		...(ad.image ? [ad.image] : []),
 		...(ad.gallery?.map((g) => g.url) ?? []),
 	];
+	const proximityMeters =
+		myCoords && ad.location ? distanceMeters(myCoords, ad.location) : null;
+	const mapLink = ad.location
+		? `https://www.google.com/maps?q=${ad.location.lat},${ad.location.lng}`
+		: null;
 
 	const handleContact = () => {
 		if (!user) {
@@ -235,6 +325,57 @@ export function AdDetailPage() {
 									</span>
 								</div>
 							) : null}
+
+							{ad.location && (
+								<div className="space-y-2 border-t border-slate-100 pt-4">
+									<div className="flex items-center gap-2 text-sm text-slate-700">
+										<FaMapMarkerAlt className="h-3.5 w-3.5 shrink-0 text-primary-600" />
+										{place?.for === ad.id &&
+										!place.value ? (
+											<span className="font-mono text-xs text-muted">
+												{formatCoords(
+													ad.location.lat,
+													ad.location.lng,
+												)}
+											</span>
+										) : place?.for === ad.id &&
+										  place.value ? (
+											<span>{place.value}</span>
+										) : (
+											<Skeleton className="h-4 w-40" />
+										)}
+									</div>
+
+									{proximityMeters !== null && (
+										<div className="flex items-center gap-2 text-sm">
+											<span className="text-primary-600">
+												A{' '}
+												{formatDistance(
+													proximityMeters,
+												)}{' '}
+												de si
+											</span>
+										</div>
+									)}
+									{(geoDenied || geoUnsupported) && (
+										<p className="text-xs text-muted">
+											Ative a localização para ver a
+											distância até si.
+										</p>
+									)}
+									{mapLink && (
+										<a
+											href={mapLink}
+											target="_blank"
+											rel="noreferrer"
+											className="inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-700"
+										>
+											<FaMapMarkerAlt className="h-3.5 w-3.5" />
+											Ver no mapa
+										</a>
+									)}
+								</div>
+							)}
 
 							<div className="flex items-center gap-3 border-t border-slate-100 pt-4">
 								<Avatar

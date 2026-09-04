@@ -119,6 +119,7 @@ export interface Ad {
 	imageId?: string | null;
 	gallery: GalleryItem[];
 	distanceKm?: number | null;
+	location?: Location | null;
 	user?: {
 		id: string;
 		name: string;
