@@ -169,27 +169,37 @@ export function AboutPage() {
 				</div>
 			</section>
 
-			<section className="rounded-3xl bg-primary-900 p-8 text-white sm:p-12">
-				<div className="mb-8 flex items-end justify-between gap-4">
+			<section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 p-8 text-white sm:p-12">
+				<div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-primary-500/20 blur-3xl" />
+				<div className="pointer-events-none absolute -bottom-28 -left-16 h-64 w-64 rounded-full bg-amber-500/10 blur-3xl" />
+				<div className="relative mb-10 flex items-end justify-between gap-4">
 					<h2 className="font-display text-2xl sm:text-3xl">
 						Os três pilares da confiança
 					</h2>
-					<span className="hidden font-mono text-xs uppercase tracking-wider text-primary-200/70 sm:block">
+					<span className="hidden font-mono text-xs uppercase tracking-wider text-white/50 sm:block">
 						Porquê
 					</span>
 				</div>
-				<div className="grid gap-6 sm:grid-cols-3">
-					{PILLARS.map((p) => {
+				<div className="relative grid gap-5 sm:grid-cols-3">
+					{PILLARS.map((p, i) => {
 						const Icon = p.icon;
 						return (
-							<div key={p.title} className="text-center">
-								<div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary-700 text-primary-100">
-									<Icon className="h-5 w-5" />
+							<div
+								key={p.title}
+								className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition hover:-translate-y-0.5 hover:bg-white/10"
+							>
+								<div className="mb-5 flex items-center justify-between">
+									<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-amber-300 ring-1 ring-white/20">
+										<Icon className="h-5 w-5" />
+									</div>
+									<span className="font-mono text-xs text-white/40">
+										0{i + 1}
+									</span>
 								</div>
 								<h3 className="font-display text-lg">
 									{p.title}
 								</h3>
-								<p className="mt-1 text-sm text-primary-100/80">
+								<p className="mt-1 text-sm text-white/70">
 									{p.desc}
 								</p>
 							</div>

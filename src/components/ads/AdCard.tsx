@@ -91,9 +91,11 @@ export function AdCard({
 								{ad.user.neighborhood}
 							</span>
 						)}
-						{ad.distanceM !== undefined &&
-							ad.distanceM !== null && (
-								<span>• {formatDistance(ad.distanceM)}</span>
+						{ad.distanceKm !== undefined &&
+							ad.distanceKm !== null && (
+								<span>
+									• {formatDistance(ad.distanceKm * 1000)}
+								</span>
 							)}
 					</div>
 					{(ad.averageRating ?? 0) > 0 && (

@@ -15,7 +15,13 @@ export async function updateProfile(
 	input: Partial<
 		Pick<
 			User,
-			'name' | 'surname' | 'phone' | 'neighborhood' | 'city' | 'image'
+			| 'name'
+			| 'surname'
+			| 'phone'
+			| 'neighborhood'
+			| 'city'
+			| 'province'
+			| 'image'
 		>
 	>,
 ): Promise<User> {

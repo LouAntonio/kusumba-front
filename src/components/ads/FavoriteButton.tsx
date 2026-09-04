@@ -20,7 +20,7 @@ export function FavoriteButton({
 		e.stopPropagation();
 		const adding = !favorited;
 		toast.promise(
-			toggle.mutateAsync(ad.id),
+			toggle.mutateAsync({ adId: ad.id, isFavorited: favorited }),
 			{
 				loading: adding
 					? 'A adicionar aos favoritos…'

@@ -70,10 +70,11 @@ export async function signUp(
 	surname: string,
 	email: string,
 	password: string,
+	province?: string,
 ): Promise<GetSessionResponse> {
 	const { data } = await api.post<GetSessionResponse>(
 		'/api/auth/sign-up/email',
-		{ name, surname, email, password },
+		{ name, surname, email, password, province },
 	);
 	return data;
 }

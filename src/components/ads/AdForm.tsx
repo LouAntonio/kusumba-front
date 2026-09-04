@@ -6,12 +6,13 @@ import { useCreateAd, useUpdateAd } from '../../hooks/useAds';
 import { useCategories } from '../../hooks/useCategories';
 import { uploadImage } from '../../api/cloudinary';
 import { getApiError } from '../../lib/axios';
-import type { Ad, AdType, GalleryItem } from '../../lib/types';
+import type { Ad, AdType, GalleryItem, Location } from '../../lib/types';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
 import { Textarea } from '../ui/Textarea';
 import { ImageUploader, type ImageUploaderHandle } from './ImageUploader';
+import { LocationPicker } from './LocationPicker';
 
 const TYPE_OPTIONS = [
 	{ value: 'SALE', label: 'Venda' },
@@ -47,6 +48,7 @@ export function AdForm({
 	const [gallery, setGallery] = useState<GalleryItem[]>(
 		initial?.gallery ?? [],
 	);
+	const [location, setLocation] = useState<Location | null>(null);
 	const [submitting, setSubmitting] = useState(false);
 	const imageUploaderRef = useRef<ImageUploaderHandle>(null);
 
@@ -132,6 +134,7 @@ export function AdForm({
 			gallery: finalGallery.length ? finalGallery : undefined,
 			image: finalGallery[0]?.url,
 			imageId: finalGallery[0]?.cloudinaryId,
+			location: location ?? undefined,
 		};
 		try {
 			if (initial) {
@@ -284,6 +287,19 @@ export function AdForm({
 					max={6}
 					label="Fotos"
 				/>
+
+				<div className="space-y-3">
+					<div>
+						<label className="text-sm font-medium text-slate-700">
+							Localização
+						</label>
+						<p className="mt-0.5 text-xs text-muted">
+							Indique onde se encontra o item. Arraste o marcador
+							no mapa ou use a sua localização.
+						</p>
+					</div>
+					<LocationPicker value={location} onChange={setLocation} />
+				</div>
 			</div>
 
 			<div className="flex justify-end gap-2 border-t border-slate-200 pt-4">

@@ -26,7 +26,9 @@ import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
+import { Select } from '../components/ui/Select';
 import { LoadingScreen } from '../components/ui/Spinner';
+import { PROVINCES } from '../lib/provinces';
 import { SessionsSection } from '../components/auth/SessionsSection';
 
 export function PerfilPage() {
@@ -41,6 +43,7 @@ export function PerfilPage() {
 	const [phone, setPhone] = useState('');
 	const [neighborhood, setNeighborhood] = useState('');
 	const [city, setCity] = useState('Luanda');
+	const [province, setProvince] = useState('');
 	const [saving, setSaving] = useState(false);
 
 	const linkedGoogle = me?.accounts?.find(
@@ -71,6 +74,7 @@ export function PerfilPage() {
 		setPhone(me?.phone ?? '');
 		setNeighborhood(me?.neighborhood ?? '');
 		setCity(me?.city ?? 'Luanda');
+		setProvince(me?.province ?? '');
 		setEditing(true);
 	};
 
@@ -167,6 +171,7 @@ export function PerfilPage() {
 				phone: phone || undefined,
 				neighborhood: neighborhood || undefined,
 				city: city || undefined,
+				province: province || undefined,
 			});
 			toast.success('Perfil atualizado!');
 			setUser(updated);
@@ -207,7 +212,11 @@ export function PerfilPage() {
 						{profile?.neighborhood && (
 							<span className="inline-flex items-center gap-1 text-muted">
 								<FaMapMarkerAlt className="h-3.5 w-3.5" />
-								{profile.neighborhood}, {profile.city}
+								{profile.neighborhood}
+								{profile.city ? `, ${profile.city}` : ''}
+								{profile.province
+									? `, ${profile.province}`
+									: ''}
 							</span>
 						)}
 						{profile?.phone && (
@@ -273,6 +282,18 @@ export function PerfilPage() {
 								onChange={(e) =>
 									setCity(e.target.value.slice(0, 120))
 								}
+							/>
+							<Select
+								label="Província"
+								value={province ?? ''}
+								onChange={(e) => setProvince(e.target.value)}
+								options={[
+									{ value: '', label: 'Selecione' },
+									...PROVINCES.map((p) => ({
+										value: p,
+										label: p,
+									})),
+								]}
 							/>
 						</div>
 						<div className="flex justify-end gap-2 border-t border-slate-200 pt-4">

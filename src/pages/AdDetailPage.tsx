@@ -80,7 +80,10 @@ export function AdDetailPage() {
 			navigate('/entrar', { state: { from: `/anuncios/${ad.slug}` } });
 			return;
 		}
-		toggleWishlist.mutate(ad.id);
+		toggleWishlist.mutate({
+			adId: ad.id,
+			isFavorited: Boolean(wishlistCheck?.inWishlist),
+		});
 	};
 
 	return (
@@ -215,12 +218,12 @@ export function AdDetailPage() {
 												{ad.user.neighborhood}
 											</span>
 										)}
-										{ad.distanceM !== undefined &&
-											ad.distanceM !== null && (
+										{ad.distanceKm !== undefined &&
+											ad.distanceKm !== null && (
 												<span>
 													•
 													{formatDistance(
-														ad.distanceM,
+														ad.distanceKm * 1000,
 													)}
 												</span>
 											)}

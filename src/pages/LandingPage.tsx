@@ -13,7 +13,7 @@ import { useAds } from '../hooks/useAds';
 import { AdCard } from '../components/ads/AdCard';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
-import { Spinner } from '../components/ui/Spinner';
+import { AdCardSkeleton, Skeleton } from '../components/ui/Skeleton';
 
 const MODES = [
 	{
@@ -153,7 +153,14 @@ export function LandingPage() {
 					</Link>
 				</div>
 				{catsLoading ? (
-					<Spinner />
+					<div className="flex flex-wrap gap-3">
+						{Array.from({ length: 8 }).map((_, i) => (
+							<Skeleton
+								key={i}
+								className="h-10 w-28 rounded-xl"
+							/>
+						))}
+					</div>
 				) : (
 					<div className="flex flex-wrap gap-3">
 						{(categories ?? []).map((cat) => (
@@ -180,7 +187,11 @@ export function LandingPage() {
 					</div>
 				</div>
 				{featuredLoading ? (
-					<Spinner />
+					<div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+						{Array.from({ length: 4 }).map((_, i) => (
+							<AdCardSkeleton key={i} />
+						))}
+					</div>
 				) : (featured?.items?.length ?? 0) > 0 ? (
 					<div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
 						{featured!.items.map((ad) => (
@@ -195,7 +206,11 @@ export function LandingPage() {
 					Recentes na comunidade
 				</h2>
 				{recentLoading ? (
-					<Spinner />
+					<div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+						{Array.from({ length: 8 }).map((_, i) => (
+							<AdCardSkeleton key={i} />
+						))}
+					</div>
 				) : (
 					<div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
 						{(recent?.items ?? []).map((ad) => (
@@ -205,22 +220,37 @@ export function LandingPage() {
 				)}
 			</section>
 
-			<section className="rounded-3xl bg-primary-900 p-8 text-white sm:p-12">
-				<h2 className="text-center font-display text-2xl sm:text-3xl">
-					Feito para a confiança entre vizinhos
-				</h2>
-				<div className="mt-8 grid gap-6 sm:grid-cols-3">
-					{PILLARS.map((pillar) => {
+			<section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-900 via-primary-800 to-primary-900 p-8 text-white sm:p-12">
+				<div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-primary-500/20 blur-3xl" />
+				<div className="pointer-events-none absolute -bottom-28 -left-16 h-64 w-64 rounded-full bg-amber-500/10 blur-3xl" />
+				<div className="relative mb-10 flex items-end justify-between gap-4">
+					<h2 className="font-display text-2xl sm:text-3xl">
+						Feito para a confiança entre vizinhos
+					</h2>
+					<span className="hidden font-mono text-xs uppercase tracking-wider text-white/50 sm:block">
+						Como funciona
+					</span>
+				</div>
+				<div className="relative grid gap-5 sm:grid-cols-3">
+					{PILLARS.map((pillar, i) => {
 						const Icon = pillar.icon;
 						return (
-							<div key={pillar.title} className="text-center">
-								<div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary-700 text-primary-100">
-									<Icon className="h-5 w-5" />
+							<div
+								key={pillar.title}
+								className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition hover:-translate-y-0.5 hover:bg-white/10"
+							>
+								<div className="mb-5 flex items-center justify-between">
+									<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-amber-300 ring-1 ring-white/20">
+										<Icon className="h-5 w-5" />
+									</div>
+									<span className="font-mono text-xs text-white/40">
+										0{i + 1}
+									</span>
 								</div>
 								<h3 className="font-display text-lg">
 									{pillar.title}
 								</h3>
-								<p className="mt-1 text-sm text-primary-100/80">
+								<p className="mt-1 text-sm text-white/70">
 									{pillar.desc}
 								</p>
 							</div>

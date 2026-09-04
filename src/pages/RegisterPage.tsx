@@ -7,7 +7,9 @@ import { getApiError } from '../lib/axios';
 import { useAuthStore } from '../store/authStore';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
+import { Select } from '../components/ui/Select';
 import { Logo } from '../components/layout/Logo';
+import { PROVINCES } from '../lib/provinces';
 
 export function RegisterPage() {
 	const navigate = useNavigate();
@@ -18,8 +20,8 @@ export function RegisterPage() {
 	const [password, setPassword] = useState('');
 	const [confirm, setConfirm] = useState('');
 	const [submitting, setSubmitting] = useState(false);
-	const [acceptedTerms, setAcceptedTerms] = useState(false);
-	const [acceptedPolicies, setAcceptedPolicies] = useState(false);
+	const [province, setProvince] = useState('');
+	const [accepted, setAccepted] = useState(false);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -31,7 +33,7 @@ export function RegisterPage() {
 			toast.error('As senhas não coincidem.');
 			return;
 		}
-		if (!acceptedTerms || !acceptedPolicies) {
+		if (!accepted) {
 			toast.error(
 				'Precisa de aceitar os Termos e a Política de Privacidade.',
 			);
@@ -44,6 +46,7 @@ export function RegisterPage() {
 				surname.trim(),
 				email.trim(),
 				password,
+				province,
 			);
 			setUser(session?.user ?? null);
 			toast.success('Conta criada com sucesso!');
@@ -149,14 +152,25 @@ export function RegisterPage() {
 						autoComplete="new-password"
 						required
 					/>
-					<div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50/60 p-3 text-sm">
+					<Select
+						label="Província"
+						value={province}
+						onChange={(e) => setProvince(e.target.value)}
+						options={[
+							{ value: '', label: 'Selecione a sua província' },
+							...PROVINCES.map((p) => ({
+								value: p,
+								label: p,
+							})),
+						]}
+						required
+					/>
+					<div className="rounded-xl border border-slate-200 bg-slate-50/60 p-3 text-sm">
 						<label className="flex cursor-pointer items-start gap-2.5">
 							<input
 								type="checkbox"
-								checked={acceptedTerms}
-								onChange={(e) =>
-									setAcceptedTerms(e.target.checked)
-								}
+								checked={accepted}
+								onChange={(e) => setAccepted(e.target.checked)}
 								className="mt-0.5 h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-400"
 								required
 							/>
@@ -168,30 +182,16 @@ export function RegisterPage() {
 									className="font-medium text-primary-600 hover:underline"
 								>
 									Termos e Condições
-								</Link>
-								.
-							</span>
-						</label>
-						<label className="flex cursor-pointer items-start gap-2.5">
-							<input
-								type="checkbox"
-								checked={acceptedPolicies}
-								onChange={(e) =>
-									setAcceptedPolicies(e.target.checked)
-								}
-								className="mt-0.5 h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-400"
-								required
-							/>
-							<span className="text-slate-700">
-								Aceito a{' '}
+								</Link>{' '}
+								e a{' '}
 								<Link
 									to="/politicas"
 									target="_blank"
 									className="font-medium text-primary-600 hover:underline"
 								>
 									Política de Privacidade
-								</Link>{' '}
-								e o Código de Conduta.
+								</Link>
+								.
 							</span>
 						</label>
 					</div>
@@ -204,8 +204,7 @@ export function RegisterPage() {
 							!surname ||
 							!email ||
 							!password ||
-							!acceptedTerms ||
-							!acceptedPolicies
+							!accepted
 						}
 						fullWidth
 					>

@@ -67,6 +67,7 @@ export interface User {
 	subscriptionTier: SubscriptionTier;
 	neighborhood?: string | null;
 	city?: string | null;
+	province?: string | null;
 	accounts?: {
 		id: string;
 		providerId: string;
@@ -87,6 +88,7 @@ export interface PublicUser {
 	subscriptionTier: SubscriptionTier;
 	neighborhood?: string | null;
 	city?: string | null;
+	province?: string | null;
 	createdAt: string;
 }
 
@@ -116,7 +118,7 @@ export interface Ad {
 	image?: string | null;
 	imageId?: string | null;
 	gallery: GalleryItem[];
-	distanceM?: number | null;
+	distanceKm?: number | null;
 	user?: {
 		id: string;
 		name: string;
@@ -142,7 +144,7 @@ export interface AdQuery {
 	page?: number;
 	limit?: number;
 	sortBy?: AdSort;
-	type?: AdType;
+	type?: string;
 	categoryIds?: string;
 	categorySlugs?: string;
 	q?: string;

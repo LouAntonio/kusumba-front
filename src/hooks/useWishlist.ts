@@ -24,11 +24,14 @@ export function useWishlistCheck(adId: string | undefined) {
 export function useToggleWishlist() {
 	const qc = useQueryClient();
 	return useMutation({
-		mutationFn: (adId: string) => {
-			return qc.getQueryData<{ inWishlist: boolean }>([
-				'wishlist-check',
-				adId,
-			])?.inWishlist
+		mutationFn: ({
+			adId,
+			isFavorited,
+		}: {
+			adId: string;
+			isFavorited: boolean;
+		}) => {
+			return isFavorited
 				? removeFromWishlist(adId).then(() => ({
 						inWishlist: false,
 					}))
@@ -36,7 +39,7 @@ export function useToggleWishlist() {
 						inWishlist: true,
 					}));
 		},
-		onSuccess: (_data, adId) => {
+		onSuccess: (_data, { adId }) => {
 			void qc.invalidateQueries({ queryKey: ['wishlist'] });
 			void qc.invalidateQueries({ queryKey: ['wishlist-check', adId] });
 		},
