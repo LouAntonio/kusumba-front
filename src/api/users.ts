@@ -1,8 +1,13 @@
 import { api } from '../lib/axios';
-import type { User } from '../lib/types';
+import type { PublicUser, User } from '../lib/types';
 
 export async function getMe(): Promise<User> {
 	const { data } = await api.get<User>('/api/users/me');
+	return data;
+}
+
+export async function getPublicUser(id: string): Promise<PublicUser> {
+	const { data } = await api.get<PublicUser>(`/api/users/public/${id}`);
 	return data;
 }
 

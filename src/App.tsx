@@ -12,7 +12,7 @@ import { RegisterPage } from './pages/RegisterPage';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import { MagicCallbackPage } from './pages/MagicCallbackPage';
-import { PerfilPage } from './pages/PerfilPage';
+import { ProfileRouter } from './pages/ProfileRouter';
 import { MeusAnunciosPage } from './pages/MeusAnunciosPage';
 import { FavoritosPage } from './pages/FavoritosPage';
 import { MinhasDenunciasPage } from './pages/MinhasDenunciasPage';
@@ -87,11 +87,7 @@ const router = createBrowserRouter([
 			{ path: '/auth/magic', element: <MagicCallbackPage /> },
 			{
 				path: '/perfil',
-				element: (
-					<RequireAuth>
-						<PerfilPage />
-					</RequireAuth>
-				),
+				element: <ProfileRouter />,
 			},
 			{
 				path: '/perfil/anuncios',

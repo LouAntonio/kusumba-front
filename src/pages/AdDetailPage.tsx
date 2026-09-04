@@ -125,7 +125,7 @@ export function AdDetailPage() {
 								{ad.categories.map((cat) => (
 									<Badge key={cat.id} tone="neutral">
 										<Link
-											to={`/anuncios?categoryIds=${cat.id}`}
+											to={`/anuncios?categorySlugs=${cat.slug}`}
 											className="hover:text-primary-700"
 										>
 											{cat.name}

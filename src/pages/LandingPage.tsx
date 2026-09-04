@@ -159,7 +159,7 @@ export function LandingPage() {
 						{(categories ?? []).map((cat) => (
 							<Card key={cat.id} hover className="px-4 py-3">
 								<Link
-									to={`/anuncios?categoryIds=${cat.id}`}
+									to={`/anuncios?categorySlugs=${cat.slug}`}
 									className="text-sm font-medium text-slate-700 hover:text-primary-700"
 								>
 									{cat.name}

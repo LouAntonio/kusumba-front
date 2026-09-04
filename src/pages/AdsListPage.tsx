@@ -34,7 +34,7 @@ export function AdsListPage() {
 
 	const q = params.get('q') ?? '';
 	const type = (params.get('type') as AdType | null) ?? undefined;
-	const categoryIds = params.get('categoryIds') ?? undefined;
+	const categorySlugs = params.get('categorySlugs') ?? undefined;
 	const sortBy =
 		(params.get('sortBy') as (typeof AD_SORTS)[number]) ?? 'newest';
 	const minPrice = params.get('minPrice') ?? '';
@@ -45,13 +45,13 @@ export function AdsListPage() {
 			limit: 24,
 			q: q || undefined,
 			type,
-			categoryIds,
+			categorySlugs,
 			sortBy,
 			minPrice: minPrice ? Number(minPrice) : undefined,
 			maxPrice: maxPrice ? Number(maxPrice) : undefined,
 		};
 		return result;
-	}, [q, type, categoryIds, sortBy, minPrice, maxPrice]);
+	}, [q, type, categorySlugs, sortBy, minPrice, maxPrice]);
 
 	const { data, isLoading } = useAds(query);
 	const { data: categories } = useCategories();
@@ -74,9 +74,9 @@ export function AdsListPage() {
 			<div className="flex flex-wrap items-center justify-between gap-3">
 				<div>
 					<h1 className="font-display text-2xl">
-						{categoryIds
+						{categorySlugs
 							? ((categories ?? []).find(
-									(c) => c.id === categoryIds,
+									(c) => c.slug === categorySlugs,
 								)?.name ?? 'Anúncios')
 							: 'Anúncios'}
 					</h1>
@@ -176,7 +176,7 @@ export function AdsListPage() {
 									const next = new URLSearchParams(params);
 									next.delete('q');
 									next.delete('type');
-									next.delete('categoryIds');
+									next.delete('categorySlugs');
 									next.delete('minPrice');
 									next.delete('maxPrice');
 									setParams(next);

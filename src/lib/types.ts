@@ -76,12 +76,24 @@ export interface User {
 	kyc?: { status: KYCStatus } | null;
 }
 
+export interface PublicUser {
+	id: string;
+	name: string;
+	surname: string;
+	image?: string | null;
+	trustScore: number;
+	isVerified: boolean;
+	subscriptionTier: SubscriptionTier;
+	neighborhood?: string | null;
+	city?: string | null;
+	createdAt: string;
+}
+
 export interface Category {
 	id: string;
 	slug: string;
 	name: string;
 }
-
 export interface Ad {
 	id: string;
 	slug: string;
@@ -131,6 +143,7 @@ export interface AdQuery {
 	sortBy?: AdSort;
 	type?: AdType;
 	categoryIds?: string;
+	categorySlugs?: string;
 	q?: string;
 	minPrice?: number;
 	maxPrice?: number;
@@ -138,6 +151,7 @@ export interface AdQuery {
 	neighborhood?: string;
 	includeInactive?: boolean;
 	featured?: boolean;
+	userId?: string;
 	lat?: number;
 	lng?: number;
 	radiusKm?: number;
