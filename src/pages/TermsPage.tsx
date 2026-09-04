@@ -1,3 +1,7 @@
+import { FaCheck } from 'react-icons/fa';
+import { cn } from '../lib/cn';
+import { useScrollSpy } from '../hooks/useScrollSpy';
+
 const SECTIONS = [
 	{
 		n: 'I',
@@ -82,6 +86,9 @@ const SECTIONS = [
 ];
 
 export function TermsPage() {
+	const sectionIds = SECTIONS.map((s) => `art-${s.n.toLowerCase()}`);
+	const active = useScrollSpy(sectionIds);
+
 	return (
 		<div className="space-y-10">
 			<header className="space-y-3">
@@ -112,32 +119,68 @@ export function TermsPage() {
 				</div>
 			</header>
 
-			<div className="rounded-3xl border border-slate-200 bg-white">
-				{SECTIONS.map((s, i) => (
-					<article
-						key={s.n}
-						id={`art-${s.n.toLowerCase()}`}
-						className={
-							i === SECTIONS.length - 1
-								? 'p-6 sm:p-8'
-								: 'border-b border-slate-100 p-6 sm:p-8'
-						}
-					>
-						<header className="mb-3 flex items-baseline gap-4">
-							<span className="font-mono text-2xl font-semibold text-primary-600">
-								Art. {s.n}
-							</span>
-							<h2 className="font-display text-xl text-slate-900">
-								{s.title}
-							</h2>
-						</header>
-						<div className="space-y-3 text-sm leading-relaxed text-slate-700">
-							{s.paragraphs.map((p, j) => (
-								<p key={j}>{p}</p>
-							))}
-						</div>
-					</article>
-				))}
+			<div className="grid gap-8 lg:grid-cols-12">
+				<nav className="lg:col-span-3">
+					<div className="sticky top-20 rounded-2xl border border-slate-200 bg-white p-2">
+						<ul className="flex flex-col">
+							{SECTIONS.map((s, i) => {
+								const id = `art-${s.n.toLowerCase()}`;
+								const isActive = active === id;
+								return (
+									<li key={s.n}>
+										<a
+											href={`#${id}`}
+											className={cn(
+												'flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition',
+												isActive
+													? 'bg-primary-50 text-primary-800'
+													: 'text-slate-600 hover:bg-slate-50',
+											)}
+										>
+											<span className="font-mono text-xs text-slate-400">
+												{String(i + 1).padStart(2, '0')}
+											</span>
+											<span className="font-medium">
+												{s.title}
+											</span>
+											{isActive && (
+												<FaCheck className="ml-auto h-3 w-3 text-primary-600" />
+											)}
+										</a>
+									</li>
+								);
+							})}
+						</ul>
+					</div>
+				</nav>
+
+				<div className="rounded-3xl border border-slate-200 bg-white lg:col-span-9">
+					{SECTIONS.map((s, i) => (
+						<article
+							key={s.n}
+							id={`art-${s.n.toLowerCase()}`}
+							className={
+								i === SECTIONS.length - 1
+									? 'scroll-mt-24 p-6 sm:p-8'
+									: 'scroll-mt-24 border-b border-slate-100 p-6 sm:p-8'
+							}
+						>
+							<header className="mb-3 flex items-baseline gap-4">
+								<span className="font-mono text-2xl font-semibold text-primary-600">
+									Art. {s.n}
+								</span>
+								<h2 className="font-display text-xl text-slate-900">
+									{s.title}
+								</h2>
+							</header>
+							<div className="space-y-3 text-sm leading-relaxed text-slate-700">
+								{s.paragraphs.map((p, j) => (
+									<p key={j}>{p}</p>
+								))}
+							</div>
+						</article>
+					))}
+				</div>
 			</div>
 
 			<aside className="rounded-2xl bg-sand p-6 text-sm text-slate-700 sm:p-8">

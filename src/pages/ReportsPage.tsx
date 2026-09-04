@@ -7,7 +7,7 @@ import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { EmptyState } from '../components/ui/EmptyState';
-import { Spinner } from '../components/ui/Spinner';
+import { Skeleton } from '../components/ui/Skeleton';
 import { formatDate } from '../lib/format';
 import { getApiError } from '../lib/axios';
 import {
@@ -90,7 +90,22 @@ export function ReportsPage() {
 			</div>
 
 			{isLoading ? (
-				<Spinner className="mx-auto" />
+				<div className="space-y-3">
+					{Array.from({ length: 4 }).map((_, i) => (
+						<div
+							key={i}
+							className="space-y-3 rounded-2xl border border-slate-200 bg-white p-5"
+						>
+							<div className="flex gap-2">
+								<Skeleton className="h-6 w-20 rounded-full" />
+								<Skeleton className="h-6 w-20 rounded-full" />
+								<Skeleton className="h-6 w-20 rounded-full" />
+							</div>
+							<Skeleton className="h-4 w-3/4" />
+							<Skeleton className="h-14 w-full rounded-lg" />
+						</div>
+					))}
+				</div>
 			) : reports.length === 0 ? (
 				<EmptyState title="Sem denúncias" />
 			) : (
@@ -125,14 +140,12 @@ export function ReportsPage() {
 									{formatDate(report.createdAt)}
 								</span>
 							</div>
-							{report.targetType === 'AD' && (
-								<p className="mt-3 text-sm text-slate-700">
-									Alvo:{' '}
-									<span className="font-medium">
-										{report.targetId}
-									</span>
-								</p>
-							)}
+							<p className="mt-3 text-sm text-slate-700">
+								Alvo:{' '}
+								<span className="font-medium">
+									{report.targetLabel ?? report.targetId}
+								</span>
+							</p>
 							{report.description && (
 								<p className="mt-2 rounded-lg bg-slate-50 p-3 text-sm text-slate-600">
 									{report.description}

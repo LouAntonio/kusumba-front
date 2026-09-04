@@ -83,6 +83,7 @@ export interface PublicUser {
 	image?: string | null;
 	trustScore: number;
 	isVerified: boolean;
+	verifiedAt?: string | null;
 	subscriptionTier: SubscriptionTier;
 	neighborhood?: string | null;
 	city?: string | null;
@@ -222,6 +223,7 @@ export interface Report {
 	id: string;
 	targetType: ReportTarget;
 	targetId: string;
+	targetLabel?: string | null;
 	reason: ReportReason;
 	description?: string | null;
 	media: GalleryItem[];

@@ -325,7 +325,7 @@ function SearchField({
 }) {
 	return (
 		<form
-			className="relative w-full max-w-md"
+			className="relative w-full"
 			onSubmit={(e) => {
 				e.preventDefault();
 				onSubmit(value);

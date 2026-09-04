@@ -2,8 +2,13 @@ import { Outlet } from 'react-router-dom';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
 import { GoogleOneTap } from '../auth/GoogleOneTap';
+import { usePageTitle } from '../../hooks/usePageTitle';
+import { useScrollToTop } from '../../hooks/useScrollToTop';
 
 export function AppLayout() {
+	usePageTitle();
+	useScrollToTop();
+
 	return (
 		<div className="flex min-h-screen flex-col">
 			<GoogleOneTap />

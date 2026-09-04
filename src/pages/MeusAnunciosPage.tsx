@@ -23,13 +23,17 @@ import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { EmptyState } from '../components/ui/EmptyState';
-import { Spinner } from '../components/ui/Spinner';
+import { Skeleton } from '../components/ui/Skeleton';
 import { formatKz } from '../lib/format';
 
 export function MeusAnunciosPage() {
 	const user = useAuthStore((s) => s.user);
 	const myId = user?.id;
-	const { data, isLoading } = useAds({ limit: 50, includeInactive: true });
+	const { data, isLoading } = useAds({
+		userId: myId,
+		limit: 50,
+		includeInactive: true,
+	});
 	const deleteAd = useDeleteAd();
 	const featureAd = useFeatureAd();
 	const unfeatureAd = useUnfeatureAd();
@@ -39,7 +43,7 @@ export function MeusAnunciosPage() {
 		return null;
 	}
 
-	const myAds = (data?.items ?? []).filter((ad) => ad.user?.id === myId);
+	const myAds = data?.items ?? [];
 
 	const handleDelete = (ad: Ad) => {
 		if (!window.confirm(`Deseja remover o anúncio "${ad.title}"?`)) {
@@ -94,7 +98,21 @@ export function MeusAnunciosPage() {
 			</div>
 
 			{isLoading ? (
-				<Spinner className="mx-auto" />
+				<div className="space-y-3">
+					{Array.from({ length: 4 }).map((_, i) => (
+						<div
+							key={i}
+							className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4"
+						>
+							<Skeleton className="h-20 w-20 shrink-0 rounded-lg" />
+							<div className="flex-1 space-y-2">
+								<Skeleton className="h-4 w-2/3" />
+								<Skeleton className="h-4 w-1/3" />
+							</div>
+							<Skeleton className="h-8 w-28 rounded-lg" />
+						</div>
+					))}
+				</div>
 			) : myAds.length === 0 ? (
 				<EmptyState
 					title="Ainda não publicou anúncios"

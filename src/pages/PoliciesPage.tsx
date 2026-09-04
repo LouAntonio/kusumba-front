@@ -1,6 +1,6 @@
-import { useState } from 'react';
 import { FaCheck } from 'react-icons/fa';
 import { cn } from '../lib/cn';
+import { useScrollSpy } from '../hooks/useScrollSpy';
 
 const SECTIONS = [
 	{
@@ -114,7 +114,8 @@ const SECTIONS = [
 ];
 
 export function PoliciesPage() {
-	const [active, setActive] = useState(SECTIONS[0].id);
+	const sectionIds = SECTIONS.map((s) => s.id);
+	const active = useScrollSpy(sectionIds);
 
 	return (
 		<div className="space-y-10">
@@ -142,7 +143,6 @@ export function PoliciesPage() {
 									<li key={s.id}>
 										<a
 											href={`#${s.id}`}
-											onClick={() => setActive(s.id)}
 											className={cn(
 												'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition',
 												isActive

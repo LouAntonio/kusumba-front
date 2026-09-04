@@ -19,8 +19,9 @@ import { Avatar } from '../components/ui/Avatar';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
-import { Spinner, LoadingScreen } from '../components/ui/Spinner';
+import { LoadingScreen } from '../components/ui/Spinner';
 import { EmptyState } from '../components/ui/EmptyState';
+import { AdCardSkeleton, Skeleton } from '../components/ui/Skeleton';
 import { AdCard } from '../components/ads/AdCard';
 import { RatingStars } from '../components/ui/RatingStars';
 
@@ -109,6 +110,11 @@ export function PublicProfilePage() {
 						<p className="mt-1 text-sm text-muted">
 							Membro desde {formatDate(profile.createdAt)}
 						</p>
+						{profile.isVerified && profile.verifiedAt && (
+							<p className="mt-1 text-sm text-emerald-600">
+								Verificado em {formatDate(profile.verifiedAt)}
+							</p>
+						)}
 						{profile.neighborhood && (
 							<p className="mt-2 inline-flex items-center gap-1 text-sm text-muted">
 								<FaMapMarkerAlt className="h-3.5 w-3.5" />
@@ -140,7 +146,11 @@ export function PublicProfilePage() {
 			<section className="space-y-4">
 				<h2 className="font-display text-xl">Anúncios</h2>
 				{adsLoading ? (
-					<Spinner className="mx-auto" />
+					<div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+						{Array.from({ length: 4 }).map((_, i) => (
+							<AdCardSkeleton key={i} />
+						))}
+					</div>
 				) : ads.length === 0 ? (
 					<EmptyState
 						icon={<FaBoxOpen />}
@@ -161,7 +171,24 @@ export function PublicProfilePage() {
 					Avaliações ({reviewsData?.total ?? 0})
 				</h2>
 				{reviewsLoading ? (
-					<Spinner className="mx-auto" />
+					<div className="space-y-4">
+						{Array.from({ length: 2 }).map((_, i) => (
+							<div
+								key={i}
+								className="space-y-2 rounded-2xl border border-slate-200 bg-white p-4"
+							>
+								<div className="flex items-center gap-3">
+									<Skeleton className="h-8 w-8 rounded-full" />
+									<div className="flex-1 space-y-1">
+										<Skeleton className="h-3 w-1/3" />
+										<Skeleton className="h-3 w-1/4" />
+									</div>
+									<Skeleton className="h-4 w-24" />
+								</div>
+								<Skeleton className="h-4 w-4/5" />
+							</div>
+						))}
+					</div>
 				) : reviews.length === 0 ? (
 					<p className="text-sm text-muted">
 						Ainda não há avaliações para este utilizador.

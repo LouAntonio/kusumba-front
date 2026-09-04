@@ -1,5 +1,7 @@
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
+import toast from 'react-hot-toast';
 import { useToggleWishlist } from '../../hooks/useWishlist';
+import { getApiError } from '../../lib/axios';
 import type { Ad } from '../../lib/types';
 import { cn } from '../../lib/cn';
 
@@ -16,7 +18,20 @@ export function FavoriteButton({
 	const handleClick = (e: React.MouseEvent) => {
 		e.preventDefault();
 		e.stopPropagation();
-		toggle.mutate(ad.id);
+		const adding = !favorited;
+		toast.promise(
+			toggle.mutateAsync(ad.id),
+			{
+				loading: adding
+					? 'A adicionar aos favoritos…'
+					: 'A remover dos favoritos…',
+				success: adding
+					? 'Adicionado aos favoritos.'
+					: 'Removido dos favoritos.',
+				error: (err) => getApiError(err),
+			},
+			{ id: `fav-${ad.id}` },
+		);
 	};
 
 	return (

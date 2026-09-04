@@ -2,7 +2,7 @@ import { useWishlist } from '../hooks/useWishlist';
 import { useAuthStore } from '../store/authStore';
 import { AdCard } from '../components/ads/AdCard';
 import { EmptyState } from '../components/ui/EmptyState';
-import { Spinner } from '../components/ui/Spinner';
+import { AdCardSkeleton } from '../components/ui/Skeleton';
 import { Button } from '../components/ui/Button';
 
 export function FavoritosPage() {
@@ -21,7 +21,11 @@ export function FavoritosPage() {
 			</div>
 
 			{isLoading ? (
-				<Spinner className="mx-auto" />
+				<div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+					{Array.from({ length: 4 }).map((_, i) => (
+						<AdCardSkeleton key={i} />
+					))}
+				</div>
 			) : favorites.length === 0 ? (
 				<EmptyState
 					title="Sem favoritos ainda"

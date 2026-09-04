@@ -200,18 +200,16 @@ export function PerfilPage() {
 						)}
 					</div>
 					<p className="text-muted">{profile?.email}</p>
-					<div className="mt-2 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+					<div className="mt-3 flex flex-wrap items-center justify-center gap-4 text-sm sm:justify-start">
 						{profile?.subscriptionTier === 'KUSUMBA_PASS' && (
 							<Badge tone="accent">Kusumba Pass</Badge>
 						)}
 						{profile?.neighborhood && (
-							<span className="inline-flex items-center gap-1 text-sm text-muted">
+							<span className="inline-flex items-center gap-1 text-muted">
 								<FaMapMarkerAlt className="h-3.5 w-3.5" />
 								{profile.neighborhood}, {profile.city}
 							</span>
 						)}
-					</div>
-					<div className="mt-3 flex flex-wrap items-center justify-center gap-4 text-sm sm:justify-start">
 						{profile?.phone && (
 							<span className="inline-flex items-center gap-1.5 text-muted">
 								<FaPhone

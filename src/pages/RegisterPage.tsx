@@ -18,6 +18,8 @@ export function RegisterPage() {
 	const [password, setPassword] = useState('');
 	const [confirm, setConfirm] = useState('');
 	const [submitting, setSubmitting] = useState(false);
+	const [acceptedTerms, setAcceptedTerms] = useState(false);
+	const [acceptedPolicies, setAcceptedPolicies] = useState(false);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -27,6 +29,12 @@ export function RegisterPage() {
 		}
 		if (password !== confirm) {
 			toast.error('As senhas não coincidem.');
+			return;
+		}
+		if (!acceptedTerms || !acceptedPolicies) {
+			toast.error(
+				'Precisa de aceitar os Termos e a Política de Privacidade.',
+			);
 			return;
 		}
 		setSubmitting(true);
@@ -141,6 +149,52 @@ export function RegisterPage() {
 						autoComplete="new-password"
 						required
 					/>
+					<div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50/60 p-3 text-sm">
+						<label className="flex cursor-pointer items-start gap-2.5">
+							<input
+								type="checkbox"
+								checked={acceptedTerms}
+								onChange={(e) =>
+									setAcceptedTerms(e.target.checked)
+								}
+								className="mt-0.5 h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-400"
+								required
+							/>
+							<span className="text-slate-700">
+								Aceito os{' '}
+								<Link
+									to="/termos"
+									target="_blank"
+									className="font-medium text-primary-600 hover:underline"
+								>
+									Termos e Condições
+								</Link>
+								.
+							</span>
+						</label>
+						<label className="flex cursor-pointer items-start gap-2.5">
+							<input
+								type="checkbox"
+								checked={acceptedPolicies}
+								onChange={(e) =>
+									setAcceptedPolicies(e.target.checked)
+								}
+								className="mt-0.5 h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-400"
+								required
+							/>
+							<span className="text-slate-700">
+								Aceito a{' '}
+								<Link
+									to="/politicas"
+									target="_blank"
+									className="font-medium text-primary-600 hover:underline"
+								>
+									Política de Privacidade
+								</Link>{' '}
+								e o Código de Conduta.
+							</span>
+						</label>
+					</div>
 					<Button
 						type="submit"
 						variant="primary"
@@ -149,7 +203,9 @@ export function RegisterPage() {
 							!name ||
 							!surname ||
 							!email ||
-							!password
+							!password ||
+							!acceptedTerms ||
+							!acceptedPolicies
 						}
 						fullWidth
 					>
