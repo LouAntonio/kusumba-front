@@ -27,7 +27,7 @@ import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
-import { LoadingScreen } from '../components/ui/Spinner';
+import { Skeleton } from '../components/ui/Skeleton';
 import { PROVINCES } from '../lib/provinces';
 import { SessionsSection } from '../components/auth/SessionsSection';
 
@@ -156,7 +156,33 @@ export function PerfilPage() {
 	};
 
 	if (isLoading) {
-		return <LoadingScreen label="A carregar o perfil…" />;
+		return (
+			<div className="mx-auto max-w-6xl space-y-6">
+				<div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start">
+					<Skeleton className="h-24 w-24 shrink-0 rounded-full" />
+					<div className="flex-1 space-y-3 text-center sm:text-left">
+						<Skeleton className="mx-auto h-7 w-48 sm:mx-0" />
+						<Skeleton className="mx-auto h-4 w-40 sm:mx-0" />
+						<Skeleton className="mx-auto h-10 w-32 rounded-lg sm:mx-0" />
+					</div>
+				</div>
+				<div className="space-y-6 lg:grid lg:grid-cols-2 lg:gap-6 lg:space-y-0">
+					<div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-6">
+						<Skeleton className="h-5 w-44" />
+						<Skeleton className="h-10 w-full rounded-lg" />
+						<Skeleton className="h-10 w-full rounded-lg" />
+						<Skeleton className="h-10 w-full rounded-lg" />
+						<Skeleton className="h-10 w-28 rounded-lg" />
+					</div>
+					<div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-6">
+						<Skeleton className="h-5 w-44" />
+						<Skeleton className="h-10 w-full rounded-lg" />
+						<Skeleton className="h-10 w-full rounded-lg" />
+						<Skeleton className="h-10 w-36 rounded-lg" />
+					</div>
+				</div>
+			</div>
+		);
 	}
 
 	const profile = me ?? user;

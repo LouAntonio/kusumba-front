@@ -7,7 +7,7 @@ import { useChatStore } from '../store/chatStore';
 import { Avatar } from '../components/ui/Avatar';
 import { Badge } from '../components/ui/Badge';
 import { EmptyState } from '../components/ui/EmptyState';
-import { Spinner } from '../components/ui/Spinner';
+import { Skeleton } from '../components/ui/Skeleton';
 import { Button } from '../components/ui/Button';
 import { formatKz, timeAgo } from '../lib/format';
 import { getApiError } from '../lib/axios';
@@ -31,7 +31,20 @@ export function MensagensPage() {
 			</div>
 
 			{isLoading ? (
-				<Spinner className="mx-auto" />
+				<div className="space-y-3">
+					{[...Array(6)].map((_, i) => (
+						<div
+							key={i}
+							className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4"
+						>
+							<Skeleton className="h-12 w-12 shrink-0 rounded-full" />
+							<div className="flex-1 space-y-2">
+								<Skeleton className="h-4 w-2/3" />
+								<Skeleton className="h-3 w-1/3" />
+							</div>
+						</div>
+					))}
+				</div>
 			) : error ? (
 				<p className="text-sm text-red-600">{getApiError(error)}</p>
 			) : conversations.length === 0 ? (

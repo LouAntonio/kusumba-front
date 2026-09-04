@@ -9,7 +9,7 @@ import { Button } from '../ui/Button';
 import { RatingStars } from '../ui/RatingStars';
 import { Textarea } from '../ui/Textarea';
 import { fullName, formatDate } from '../../lib/format';
-import { Spinner } from '../ui/Spinner';
+import { Skeleton } from '../ui/Skeleton';
 
 export function AdReviews({ adId }: { adId: string }) {
 	const { data, isLoading } = useAdReviews(adId);
@@ -92,7 +92,21 @@ export function AdReviews({ adId }: { adId: string }) {
 			)}
 
 			{isLoading ? (
-				<Spinner />
+				<div className="space-y-4">
+					{[...Array(3)].map((_, i) => (
+						<div
+							key={i}
+							className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4"
+						>
+							<Skeleton className="h-8 w-8 shrink-0 rounded-full" />
+							<div className="flex-1 space-y-2">
+								<Skeleton className="h-3 w-1/3" />
+								<Skeleton className="h-3 w-24" />
+								<Skeleton className="h-4 w-4/5" />
+							</div>
+						</div>
+					))}
+				</div>
 			) : (data?.items?.length ?? 0) === 0 ? (
 				<p className="text-sm text-muted">
 					Ainda não há avaliações para este anúncio.

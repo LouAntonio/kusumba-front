@@ -3,7 +3,7 @@ import { useAd } from '../hooks/useAds';
 import { useAuthStore } from '../store/authStore';
 import { AdForm } from '../components/ads/AdForm';
 import { Card } from '../components/ui/Card';
-import { LoadingScreen } from '../components/ui/Spinner';
+import { Skeleton } from '../components/ui/Skeleton';
 import { Button } from '../components/ui/Button';
 
 export function EditAdPage() {
@@ -13,7 +13,29 @@ export function EditAdPage() {
 	const { data: ad, isLoading } = useAd(slug);
 
 	if (isLoading) {
-		return <LoadingScreen label="A carregar anúncio…" />;
+		return (
+			<div className="mx-auto max-w-6xl space-y-6">
+				<div className="space-y-2">
+					<Skeleton className="h-7 w-52" />
+					<Skeleton className="h-4 w-72" />
+				</div>
+				<div className="space-y-5 rounded-2xl border border-slate-200 bg-white p-6">
+					<div className="space-y-3">
+						<Skeleton className="h-4 w-24" />
+						<Skeleton className="h-10 w-full rounded-lg" />
+					</div>
+					<div className="space-y-3">
+						<Skeleton className="h-4 w-24" />
+						<Skeleton className="h-10 w-full rounded-lg" />
+					</div>
+					<div className="space-y-3">
+						<Skeleton className="h-4 w-24" />
+						<Skeleton className="h-10 w-full rounded-lg" />
+					</div>
+					<Skeleton className="h-10 w-32 rounded-lg" />
+				</div>
+			</div>
+		);
 	}
 
 	if (!ad) {

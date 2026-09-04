@@ -20,7 +20,7 @@ import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Gallery } from '../components/ads/Gallery';
-import { LoadingScreen } from '../components/ui/Spinner';
+import { Skeleton } from '../components/ui/Skeleton';
 import { RatingStars } from '../components/ui/RatingStars';
 import { Avatar } from '../components/ui/Avatar';
 import { ReportModal } from '../components/ui/ReportModal';
@@ -40,7 +40,44 @@ export function AdDetailPage() {
 	const createConversation = useCreateConversation();
 
 	if (isLoading) {
-		return <LoadingScreen label="A carregar o anúncio…" />;
+		return (
+			<div className="space-y-8">
+				<nav className="flex items-center gap-2 text-sm text-muted">
+					<Skeleton className="h-4 w-16" />
+					<span>/</span>
+					<Skeleton className="h-4 w-40" />
+				</nav>
+
+				<div className="grid gap-8 lg:grid-cols-[1.2fr_1fr]">
+					<div className="space-y-6">
+						<Skeleton className="aspect-square w-full rounded-2xl" />
+
+						<div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-5">
+							<Skeleton className="h-5 w-40" />
+							<Skeleton className="h-4 w-full" />
+							<Skeleton className="h-4 w-4/5" />
+							<Skeleton className="h-4 w-3/5" />
+						</div>
+
+						<div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-5">
+							<Skeleton className="h-4 w-1/3" />
+							<Skeleton className="h-4 w-2/3" />
+							<Skeleton className="h-3 w-1/2" />
+						</div>
+					</div>
+
+					<div className="lg:sticky lg:top-24 lg:self-start">
+						<div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-5">
+							<Skeleton className="h-4 w-20 rounded-full" />
+							<Skeleton className="h-8 w-40" />
+							<Skeleton className="h-4 w-32" />
+							<Skeleton className="h-10 w-full rounded-lg" />
+							<Skeleton className="h-10 w-full rounded-lg" />
+						</div>
+					</div>
+				</div>
+			</div>
+		);
 	}
 	if (isError || !ad) {
 		return (

@@ -7,7 +7,7 @@ import { subscribe } from '../api/subscriptions';
 import { getApiError } from '../lib/axios';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
-import { Spinner } from '../components/ui/Spinner';
+import { Skeleton } from '../components/ui/Skeleton';
 import { formatKz } from '../lib/format';
 
 export function PlanosPage() {
@@ -44,7 +44,23 @@ export function PlanosPage() {
 			</div>
 
 			{isLoading ? (
-				<Spinner className="mx-auto" />
+				<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+					{[...Array(3)].map((_, i) => (
+						<div
+							key={i}
+							className="flex flex-col space-y-4 rounded-2xl border border-slate-200 bg-white p-6"
+						>
+							<Skeleton className="h-6 w-32" />
+							<Skeleton className="h-8 w-40" />
+							<div className="space-y-2 pt-2">
+								{[...Array(4)].map((_, j) => (
+									<Skeleton key={j} className="h-4 w-full" />
+								))}
+							</div>
+							<Skeleton className="mt-auto h-10 w-full rounded-lg" />
+						</div>
+					))}
+				</div>
 			) : plans.length === 0 ? (
 				<p className="text-center text-muted">
 					Ainda não há planos disponíveis.

@@ -3,6 +3,7 @@ import { useMe } from '../hooks/useUsers';
 import { AdForm } from '../components/ads/AdForm';
 import { Navigate, Link } from 'react-router-dom';
 import { Card } from '../components/ui/Card';
+import { Skeleton } from '../components/ui/Skeleton';
 import { Button } from '../components/ui/Button';
 import { FaShieldAlt } from 'react-icons/fa';
 
@@ -16,8 +17,26 @@ export function CreateAdPage() {
 
 	if (isLoading) {
 		return (
-			<div className="mx-auto max-w-2xl text-center text-muted">
-				A verificar a identidade…
+			<div className="mx-auto max-w-6xl space-y-6">
+				<div className="space-y-2">
+					<Skeleton className="h-7 w-52" />
+					<Skeleton className="h-4 w-72" />
+				</div>
+				<div className="space-y-5 rounded-2xl border border-slate-200 bg-white p-6">
+					<div className="space-y-3">
+						<Skeleton className="h-4 w-24" />
+						<Skeleton className="h-10 w-full rounded-lg" />
+					</div>
+					<div className="space-y-3">
+						<Skeleton className="h-4 w-24" />
+						<Skeleton className="h-10 w-full rounded-lg" />
+					</div>
+					<div className="space-y-3">
+						<Skeleton className="h-4 w-24" />
+						<Skeleton className="h-10 w-full rounded-lg" />
+					</div>
+					<Skeleton className="h-10 w-32 rounded-lg" />
+				</div>
 			</div>
 		);
 	}

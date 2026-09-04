@@ -9,6 +9,12 @@ import {
 	FaSearch,
 	FaSignOutAlt,
 	FaTimes,
+	FaBoxOpen,
+	FaShieldAlt,
+	FaCrown,
+	FaCreditCard,
+	FaFlag,
+	FaGavel,
 } from 'react-icons/fa';
 import { useAuthStore } from '../../store/authStore';
 import { signOut } from '../../lib/auth';
@@ -117,7 +123,10 @@ export function Navbar() {
 
 			{mobileOpen && (
 				<div className="border-t border-slate-200 bg-white px-4 py-3 md:hidden">
-					<MobileMenuItems user={user} />
+					<MobileMenuItems
+						user={user}
+						onClose={() => setMobileOpen(false)}
+					/>
 				</div>
 			)}
 		</header>
@@ -235,8 +244,10 @@ function ProfileMenuItems({ onClose }: { onClose: () => void }) {
 
 function MobileMenuItems({
 	user,
+	onClose,
 }: {
 	user: ReturnType<typeof useAuthStore.getState>['user'];
+	onClose: () => void;
 }) {
 	const clear = useAuthStore((s) => s.clear);
 	const navigate = useNavigate();
@@ -251,6 +262,7 @@ function MobileMenuItems({
 			// ignore - clear local session regardless
 		}
 		clear();
+		onClose();
 		navigate('/');
 	};
 

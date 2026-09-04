@@ -6,7 +6,7 @@ import { cancelSubscription } from '../api/subscriptions';
 import { getApiError } from '../lib/axios';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
-import { LoadingScreen } from '../components/ui/Spinner';
+import { Skeleton } from '../components/ui/Skeleton';
 import { Badge } from '../components/ui/Badge';
 import { formatDate } from '../lib/format';
 
@@ -31,7 +31,30 @@ export function SubscriptionPage() {
 	};
 
 	if (isLoading) {
-		return <LoadingScreen label="A carregar assinatura…" />;
+		return (
+			<div className="mx-auto max-w-6xl space-y-6">
+				<div className="text-center">
+					<Skeleton className="mx-auto mb-3 h-12 w-12 rounded-full" />
+					<Skeleton className="mx-auto h-7 w-56" />
+				</div>
+				<div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+					<Skeleton className="h-24 w-full rounded-none" />
+					<div className="space-y-4 p-6">
+						<div className="flex items-center justify-between">
+							<Skeleton className="h-4 w-16" />
+							<Skeleton className="h-4 w-24" />
+						</div>
+						<div className="flex items-center justify-between">
+							<Skeleton className="h-4 w-16" />
+							<Skeleton className="h-4 w-24" />
+						</div>
+						<div className="flex justify-end gap-3 border-t border-slate-200 pt-4">
+							<Skeleton className="h-10 w-32 rounded-lg" />
+						</div>
+					</div>
+				</div>
+			</div>
+		);
 	}
 
 	return (

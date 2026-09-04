@@ -11,7 +11,7 @@ import {
 import { getApiError } from '../../lib/axios';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
-import { Spinner } from '../ui/Spinner';
+import { Skeleton } from '../ui/Skeleton';
 import { formatDate } from '../../lib/format';
 
 function isMobileAgent(ua: string | null | undefined): boolean {
@@ -102,7 +102,23 @@ export function SessionsSection() {
 			</h2>
 
 			{loading ? (
-				<Spinner className="mx-auto" />
+				<div className="space-y-3">
+					{[...Array(3)].map((_, i) => (
+						<div
+							key={i}
+							className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 p-3"
+						>
+							<div className="flex items-center gap-3">
+								<Skeleton className="h-10 w-10 rounded-lg" />
+								<div className="space-y-1.5">
+									<Skeleton className="h-4 w-40" />
+									<Skeleton className="h-3 w-24" />
+								</div>
+							</div>
+							<Skeleton className="h-8 w-16 rounded-lg" />
+						</div>
+					))}
+				</div>
 			) : sessions.length === 0 ? (
 				<p className="text-sm text-muted">Sem sessões ativas.</p>
 			) : (

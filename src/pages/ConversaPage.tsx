@@ -8,7 +8,8 @@ import { useChatSocket } from '../hooks/useChatSocket';
 import { useAuthStore } from '../store/authStore';
 import { useChatStore } from '../store/chatStore';
 import { Avatar } from '../components/ui/Avatar';
-import { LoadingScreen, Spinner } from '../components/ui/Spinner';
+import { Spinner } from '../components/ui/Spinner';
+import { Skeleton } from '../components/ui/Skeleton';
 import { formatTime } from '../lib/format';
 import { getApiError } from '../lib/axios';
 import type { Conversation, Message } from '../lib/types';
@@ -101,7 +102,35 @@ export function ConversaPage() {
 	};
 
 	if (isLoading) {
-		return <LoadingScreen label="A carregar conversa…" />;
+		return (
+			<div className="mx-auto flex h-[calc(100vh-8rem)] max-w-6xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white">
+				<div className="flex items-center gap-3 border-b border-slate-200 bg-slate-50 px-4 py-3">
+					<Skeleton className="h-4 w-4" />
+					<Skeleton className="h-8 w-8 rounded-full" />
+					<div className="space-y-1.5">
+						<Skeleton className="h-4 w-40" />
+						<Skeleton className="h-3 w-24" />
+					</div>
+				</div>
+				<div className="flex-1 space-y-3 overflow-y-auto p-4">
+					<div className="flex justify-start">
+						<Skeleton className="h-10 w-64 rounded-2xl rounded-tl-md" />
+					</div>
+					<div className="flex justify-end">
+						<Skeleton className="h-10 w-48 rounded-2xl rounded-tr-md" />
+					</div>
+					<div className="flex justify-start">
+						<Skeleton className="h-10 w-56 rounded-2xl rounded-tl-md" />
+					</div>
+					<div className="flex justify-end">
+						<Skeleton className="h-10 w-40 rounded-2xl rounded-tr-md" />
+					</div>
+				</div>
+				<div className="border-t border-slate-200 p-3">
+					<Skeleton className="h-12 w-full rounded-xl" />
+				</div>
+			</div>
+		);
 	}
 
 	const other = conversation?.other;

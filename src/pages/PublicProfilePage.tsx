@@ -19,7 +19,6 @@ import { Avatar } from '../components/ui/Avatar';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
-import { LoadingScreen } from '../components/ui/Spinner';
 import { EmptyState } from '../components/ui/EmptyState';
 import { AdCardSkeleton, Skeleton } from '../components/ui/Skeleton';
 import { AdCard } from '../components/ads/AdCard';
@@ -40,7 +39,26 @@ export function PublicProfilePage() {
 	const createConversation = useCreateConversation();
 
 	if (isLoading || !userId) {
-		return <LoadingScreen label="A carregar o perfil…" />;
+		return (
+			<div className="mx-auto max-w-6xl space-y-8">
+				<div className="flex flex-col items-center gap-5 rounded-2xl border border-slate-200 bg-white p-6 sm:flex-row sm:items-start">
+					<Skeleton className="h-24 w-24 shrink-0 rounded-full" />
+					<div className="flex-1 space-y-3 text-center sm:text-left">
+						<div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+							<Skeleton className="h-7 w-48" />
+							<Skeleton className="h-5 w-5 rounded-full" />
+						</div>
+						<Skeleton className="mx-auto h-4 w-40 sm:mx-0" />
+						<Skeleton className="mx-auto h-4 w-52 sm:mx-0" />
+						<div className="mx-auto flex gap-4 sm:mx-0">
+							<Skeleton className="h-4 w-24" />
+							<Skeleton className="h-4 w-24" />
+						</div>
+						<Skeleton className="mx-auto h-10 w-36 rounded-lg sm:mx-0" />
+					</div>
+				</div>
+			</div>
+		);
 	}
 
 	if (isError || !profile) {
