@@ -28,12 +28,7 @@ const SORT_LABELS: Record<(typeof AD_SORTS)[number], string> = {
 	distance: 'Mais próximos',
 };
 
-const RADIUS_OPTIONS = [
-	{ value: '5', label: '5 km' },
-	{ value: '10', label: '10 km' },
-	{ value: '25', label: '25 km' },
-	{ value: '50', label: '50 km' },
-];
+const MAX_RADIUS_KM = 199;
 
 const TYPE_KEYS: AdType[] = ['SALE', 'TRADE', 'DONATION'];
 
@@ -284,17 +279,58 @@ export function AdsListPage() {
 										<FaMapMarkerAlt className="h-3.5 w-3.5 text-primary-600" />
 										Localização ativa
 									</div>
-									<div>
-										<Select
-											label="Raio (km)"
-											value={radiusKm}
+									<div className="space-y-2">
+										<div className="flex items-center justify-between">
+											<label
+												htmlFor="radius-slider"
+												className="text-xs font-medium text-slate-700"
+											>
+												Distância máx.
+											</label>
+											<span className="inline-flex items-center gap-1 rounded-md bg-white px-2 py-1 text-xs font-semibold text-primary-700 ring-1 ring-slate-200">
+												{radiusKm ? radiusKm : '10'} km
+											</span>
+										</div>
+										<input
+											id="radius-slider"
+											type="range"
+											min="1"
+											max={MAX_RADIUS_KM}
+											value={
+												radiusKm ? Number(radiusKm) : 10
+											}
 											onChange={(e) =>
 												updateParam(
 													'radiusKm',
 													e.target.value,
 												)
 											}
-											options={RADIUS_OPTIONS}
+											className="h-2 w-full cursor-pointer accent-primary-600"
+										/>
+										<div className="flex items-center justify-between text-[10px] text-slate-400">
+											<span>1 km</span>
+											<span>{MAX_RADIUS_KM} km</span>
+										</div>
+										<input
+											type="number"
+											min="1"
+											max={MAX_RADIUS_KM}
+											value={
+												radiusKm ? Number(radiusKm) : 10
+											}
+											onChange={(e) => {
+												const v = e.target.value;
+												if (
+													v === '' ||
+													(Number(v) >= 1 &&
+														Number(v) <=
+															MAX_RADIUS_KM)
+												) {
+													updateParam('radiusKm', v);
+												}
+											}}
+											className="h-8 w-full rounded-lg border border-slate-300 bg-white px-2 text-sm"
+											aria-label="Raio em quilómetros"
 										/>
 									</div>
 									<button
