@@ -16,6 +16,7 @@ import { ProfileRouter } from './pages/ProfileRouter';
 import { MeusAnunciosPage } from './pages/MeusAnunciosPage';
 import { FavoritosPage } from './pages/FavoritosPage';
 import { MinhasDenunciasPage } from './pages/MinhasDenunciasPage';
+import { MinhasComprasPage } from './pages/MinhasComprasPage';
 import { KycPage } from './pages/KycPage';
 import { MensagensPage } from './pages/MensagensPage';
 import { ConversaPage } from './pages/ConversaPage';
@@ -110,6 +111,14 @@ const router = createBrowserRouter([
 				element: (
 					<RequireAuth>
 						<MinhasDenunciasPage />
+					</RequireAuth>
+				),
+			},
+			{
+				path: '/perfil/compras',
+				element: (
+					<RequireAuth>
+						<MinhasComprasPage />
 					</RequireAuth>
 				),
 			},

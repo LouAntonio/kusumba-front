@@ -9,6 +9,7 @@ import {
 	FaEnvelope,
 	FaLock,
 	FaGoogle,
+	FaUniversity,
 } from 'react-icons/fa';
 import { useMe } from '../hooks/useUsers';
 import { useAuthStore } from '../store/authStore';
@@ -44,6 +45,9 @@ export function PerfilPage() {
 	const [neighborhood, setNeighborhood] = useState('');
 	const [city, setCity] = useState('Luanda');
 	const [province, setProvince] = useState('');
+	const [bankName, setBankName] = useState('');
+	const [bankHolder, setBankHolder] = useState('');
+	const [bankIban, setBankIban] = useState('');
 	const [saving, setSaving] = useState(false);
 
 	const linkedGoogle = me?.accounts?.find(
@@ -75,6 +79,9 @@ export function PerfilPage() {
 		setNeighborhood(me?.neighborhood ?? '');
 		setCity(me?.city ?? 'Luanda');
 		setProvince(me?.province ?? '');
+		setBankName(me?.bankName ?? '');
+		setBankHolder(me?.bankHolder ?? '');
+		setBankIban(me?.bankIban ?? '');
 		setEditing(true);
 	};
 
@@ -198,6 +205,9 @@ export function PerfilPage() {
 				neighborhood: neighborhood || undefined,
 				city: city || undefined,
 				province: province || undefined,
+				bankName: bankName || undefined,
+				bankHolder: bankHolder || undefined,
+				bankIban: bankIban || undefined,
 			});
 			toast.success('Perfil atualizado!');
 			setUser(updated);
@@ -322,6 +332,44 @@ export function PerfilPage() {
 								]}
 							/>
 						</div>
+
+						<div className="space-y-3 border-t border-slate-200 pt-4">
+							<h3 className="flex items-center gap-2 text-sm font-semibold text-slate-800">
+								<FaUniversity className="h-4 w-4 text-primary-500" />
+								Dados bancários (para receber pagamentos)
+							</h3>
+							<div className="grid gap-4 sm:grid-cols-2">
+								<Input
+									label="Banco"
+									value={bankName ?? ''}
+									onChange={(e) =>
+										setBankName(
+											e.target.value.slice(0, 120),
+										)
+									}
+									placeholder="Ex.: Banco BAI"
+								/>
+								<Input
+									label="Titular da conta"
+									value={bankHolder ?? ''}
+									onChange={(e) =>
+										setBankHolder(
+											e.target.value.slice(0, 120),
+										)
+									}
+									placeholder="Nome completo do titular"
+								/>
+								<Input
+									label="IBAN / número de conta"
+									value={bankIban ?? ''}
+									onChange={(e) =>
+										setBankIban(e.target.value.slice(0, 40))
+									}
+									placeholder="Ex.: 001640028644562"
+									className="sm:col-span-2"
+								/>
+							</div>
+						</div>
 						<div className="flex justify-end gap-2 border-t border-slate-200 pt-4">
 							<Button
 								type="button"
@@ -335,6 +383,41 @@ export function PerfilPage() {
 							</Button>
 						</div>
 					</form>
+				</Card>
+			)}
+
+			{!editing && (
+				<Card className="p-6">
+					<div className="mb-4 flex items-center justify-between">
+						<h2 className="flex items-center gap-2 font-display text-lg">
+							<FaUniversity className="h-4 w-4 text-primary-500" />
+							Dados bancários
+						</h2>
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={openEditing}
+						>
+							Editar
+						</Button>
+					</div>
+					{profile?.bankName ? (
+						<div className="space-y-1 text-sm text-slate-700">
+							<p className="font-semibold">{profile.bankName}</p>
+							{profile.bankHolder && <p>{profile.bankHolder}</p>}
+							{profile.bankIban && (
+								<p className="font-mono text-xs text-muted">
+									{profile.bankIban}
+								</p>
+							)}
+						</div>
+					) : (
+						<p className="text-sm text-muted">
+							Sem dados bancários guardados. Adicione o banco onde
+							deseja receber os pagamentos das suas vendas
+							aprovadas no Kusumba.
+						</p>
+					)}
 				</Card>
 			)}
 

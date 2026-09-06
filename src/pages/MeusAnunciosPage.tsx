@@ -14,11 +14,13 @@ import {
 	useFeatureAd,
 	useUnfeatureAd,
 } from '../hooks/useAds';
+import { usePlatformConfig } from '../hooks/usePayments';
 import { useAuthStore } from '../store/authStore';
 import { setAdVisibility } from '../api/ads';
 import type { Ad } from '../lib/types';
 import { getApiError } from '../lib/axios';
 import { AD_STATUS_LABELS, AD_TYPE_LABELS } from '../lib/types';
+import { FeeBreakdown } from '../components/ads/FeeBreakdown';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
@@ -34,6 +36,7 @@ export function MeusAnunciosPage() {
 		limit: 50,
 		includeInactive: true,
 	});
+	const { data: platformConfig } = usePlatformConfig();
 	const deleteAd = useDeleteAd();
 	const featureAd = useFeatureAd();
 	const unfeatureAd = useUnfeatureAd();
@@ -170,6 +173,17 @@ export function MeusAnunciosPage() {
 											? formatKz(ad.price)
 											: '-'}
 								</p>
+								{ad.type === 'SALE' &&
+									ad.price != null &&
+									platformConfig && (
+										<FeeBreakdown
+											price={ad.price}
+											feePercent={
+												platformConfig.feePercent
+											}
+											className="mt-3 max-w-md"
+										/>
+									)}
 							</div>
 							<div className="flex flex-wrap gap-2">
 								<Button

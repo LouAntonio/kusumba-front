@@ -10,12 +10,17 @@ import {
 	FaCommentDots,
 	FaCheckCircle,
 	FaHandshake,
+	FaTimes,
+	FaMoneyBillAlt,
 } from 'react-icons/fa';
 import { useAd } from '../hooks/useAds';
 import { useWishlistCheck, useToggleWishlist } from '../hooks/useWishlist';
 import { useCreateConversation } from '../hooks/useChat';
+import { useCreatePayment, useSubmitProof } from '../hooks/usePayments';
+import { uploadImage } from '../api/cloudinary';
 import { useAuthStore } from '../store/authStore';
 import { getApiError } from '../lib/axios';
+import { PAYMENT_STATUS_LABELS, type PaymentItem } from '../lib/types';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
@@ -71,6 +76,10 @@ export function AdDetailPage() {
 		value: string | null;
 	} | null>(null);
 	const [geoDenied, setGeoDenied] = useState(false);
+	const [buyOpen, setBuyOpen] = useState(false);
+	const [activePayment, setActivePayment] = useState<PaymentItem | null>(
+		null,
+	);
 
 	const geoUnsupported = !('geolocation' in navigator);
 
@@ -123,6 +132,8 @@ export function AdDetailPage() {
 	const { data: wishlistCheck } = useWishlistCheck(ad?.id);
 	const toggleWishlist = useToggleWishlist();
 	const createConversation = useCreateConversation();
+	const createPayment = useCreatePayment();
+	const submitProof = useSubmitProof();
 
 	if (isLoading) {
 		return (
@@ -211,6 +222,55 @@ export function AdDetailPage() {
 			adId: ad.id,
 			isFavorited: Boolean(wishlistCheck?.inWishlist),
 		});
+	};
+
+	const canBuy =
+		ad.type === 'SALE' &&
+		ad.status === 'ACTIVE' &&
+		ad.visibility === 'VISIBLE' &&
+		ad.price != null;
+
+	const handleBuy = () => {
+		if (!user) {
+			navigate('/entrar', { state: { from: `/anuncios/${ad.slug}` } });
+			return;
+		}
+		createPayment.mutate(ad.id, {
+			onSuccess: (payment) => {
+				setActivePayment(payment);
+				setBuyOpen(true);
+			},
+			onError: (error) => toast.error(getApiError(error)),
+		});
+	};
+
+	const handleProofFile = async (file: File) => {
+		if (!activePayment) {
+			return;
+		}
+		try {
+			const uploaded = await uploadImage(file, {
+				folder: 'comprovativos',
+			});
+			submitProof.mutate(
+				{
+					id: activePayment.id,
+					proofUrl: uploaded.url,
+					proofId: uploaded.cloudinaryId,
+				},
+				{
+					onSuccess: (payment) => {
+						setActivePayment(payment);
+						toast.success(
+							'Comprovativo enviado. Ficará a aguardar verificação.',
+						);
+					},
+					onError: (error) => toast.error(getApiError(error)),
+				},
+			);
+		} catch (error) {
+			toast.error(getApiError(error));
+		}
 	};
 
 	return (
@@ -417,6 +477,33 @@ export function AdDetailPage() {
 
 							{!isOwner && (
 								<div className="space-y-2 pt-2">
+									{canBuy && activePayment && (
+										<Button
+											onClick={() => setBuyOpen(true)}
+											variant="accent"
+											fullWidth
+										>
+											<FaMoneyBillAlt className="h-4 w-4" />
+											{
+												PAYMENT_STATUS_LABELS[
+													activePayment.status
+												]
+											}
+										</Button>
+									)}
+									{canBuy && !activePayment && (
+										<Button
+											onClick={handleBuy}
+											variant="accent"
+											fullWidth
+											disabled={createPayment.isPending}
+										>
+											<FaMoneyBillAlt className="h-4 w-4" />
+											{createPayment.isPending
+												? 'A preparar…'
+												: 'Comprar via transferência'}
+										</Button>
+									)}
 									<Button
 										onClick={handleContact}
 										disabled={createConversation.isPending}
@@ -462,6 +549,183 @@ export function AdDetailPage() {
 				targetType="AD"
 				targetId={ad.id}
 			/>
+
+			{buyOpen && activePayment && (
+				<div
+					className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+					onClick={() => setBuyOpen(false)}
+					role="dialog"
+					aria-modal="true"
+				>
+					<div
+						className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
+						onClick={(e) => e.stopPropagation()}
+					>
+						<div className="mb-4 flex items-start justify-between gap-3">
+							<div>
+								<h2 className="font-display text-lg">
+									Comprar via transferência
+								</h2>
+								<p className="text-sm text-muted">
+									{
+										PAYMENT_STATUS_LABELS[
+											activePayment.status
+										]
+									}
+								</p>
+							</div>
+							<button
+								onClick={() => setBuyOpen(false)}
+								className="rounded-md p-1 text-slate-400 hover:text-slate-600"
+								aria-label="Fechar"
+							>
+								<FaTimes className="h-4 w-4" />
+							</button>
+						</div>
+
+						{activePayment.status === 'PENDING' &&
+							activePayment.platformAccount && (
+								<div className="space-y-4">
+									<div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm">
+										<div className="flex justify-between text-slate-600">
+											<span>Transferir</span>
+											<span className="font-mono font-semibold text-slate-900">
+												{formatKz(activePayment.amount)}
+											</span>
+										</div>
+										<div className="mt-3 space-y-1 text-slate-700">
+											<p className="font-semibold">
+												{
+													activePayment
+														.platformAccount
+														.bankName
+												}
+											</p>
+											<p>
+												Titular:{' '}
+												{
+													activePayment
+														.platformAccount
+														.bankHolder
+												}
+											</p>
+											{activePayment.platformAccount
+												.bankIban && (
+												<p className="font-mono text-xs">
+													{
+														activePayment
+															.platformAccount
+															.bankIban
+													}
+												</p>
+											)}
+										</div>
+									</div>
+									<ProofUploader
+										onFile={handleProofFile}
+										busy={submitProof.isPending}
+									/>
+								</div>
+							)}
+
+						{(activePayment.status === 'UNDER_REVIEW' ||
+							activePayment.status === 'APPROVED' ||
+							activePayment.status === 'RELEASED') && (
+							<div className="space-y-3">
+								{activePayment.proofUrl && (
+									<a
+										href={activePayment.proofUrl}
+										target="_blank"
+										rel="noreferrer"
+										className="block text-sm font-medium text-primary-600 hover:text-primary-700"
+									>
+										Ver comprovativo enviado
+									</a>
+								)}
+								<p className="text-sm text-muted">
+									{activePayment.status === 'UNDER_REVIEW'
+										? 'O seu comprovativo está a ser analisado pela equipa. O anúncio só será vendido após aprovação.'
+										: activePayment.status === 'APPROVED'
+											? 'Pagamento aprovado! O valor será libertado ao vendedor dentro de 7 dias.'
+											: 'Pagamento concluído. Obrigado!'}
+								</p>
+							</div>
+						)}
+
+						{activePayment.status === 'REJECTED' && (
+							<div className="space-y-3">
+								<p className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
+									{activePayment.adminNote ||
+										'O comprovativo foi recusado. Envie novamente com os dados corretos.'}
+								</p>
+								<ProofUploader
+									onFile={handleProofFile}
+									busy={submitProof.isPending}
+								/>
+							</div>
+						)}
+
+						{activePayment.status === 'CANCELLED' && (
+							<p className="text-sm text-muted">
+								Este pagamento foi cancelado.
+							</p>
+						)}
+
+						<div className="mt-5 flex justify-end">
+							<Button
+								variant="outline"
+								onClick={() => setBuyOpen(false)}
+							>
+								Fechar
+							</Button>
+						</div>
+					</div>
+				</div>
+			)}
+		</div>
+	);
+}
+
+function ProofUploader({
+	onFile,
+	busy,
+}: {
+	onFile: (file: File) => void;
+	busy: boolean;
+}) {
+	const [fileName, setFileName] = useState('');
+	const [error, setError] = useState('');
+
+	return (
+		<div className="space-y-2">
+			<label className="block cursor-pointer rounded-xl border-2 border-dashed border-slate-300 p-4 text-center text-sm text-slate-500 hover:border-primary-400 hover:text-primary-600">
+				<input
+					type="file"
+					accept="image/*"
+					disabled={busy}
+					className="hidden"
+					onChange={(e) => {
+						const file = e.target.files?.[0];
+						if (!file) {
+							return;
+						}
+						if (!file.type.startsWith('image/')) {
+							setError('O comprovativo deve ser uma imagem.');
+							setFileName('');
+							return;
+						}
+						setError('');
+						setFileName(file.name);
+						onFile(file);
+					}}
+				/>
+				{fileName
+					? busy
+						? 'A enviar comprovativo…'
+						: fileName
+					: 'Escolher comprovativo…'}
+			</label>
+			{error && <p className="text-xs text-red-600">{error}</p>}
 		</div>
 	);
 }

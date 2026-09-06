@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { FaPlus, FaTimes } from 'react-icons/fa';
 import { useCreateAd, useUpdateAd } from '../../hooks/useAds';
+import { usePlatformConfig } from '../../hooks/usePayments';
 import { useCategories } from '../../hooks/useCategories';
 import { uploadImage } from '../../api/cloudinary';
 import { getApiError } from '../../lib/axios';
@@ -13,6 +14,7 @@ import { Select } from '../ui/Select';
 import { Textarea } from '../ui/Textarea';
 import { ImageUploader, type ImageUploaderHandle } from './ImageUploader';
 import { LocationPicker } from './LocationPicker';
+import { FeeBreakdown } from './FeeBreakdown';
 
 const TYPE_OPTIONS = [
 	{ value: 'SALE', label: 'Venda' },
@@ -31,6 +33,7 @@ export function AdForm({
 }) {
 	const navigate = useNavigate();
 	const { data: categories } = useCategories();
+	const { data: platformConfig } = usePlatformConfig();
 	const createAd = useCreateAd();
 	const updateAd = useUpdateAd(initial?.id ?? '');
 
@@ -204,6 +207,13 @@ export function AdForm({
 						/>
 					)}
 				</div>
+
+				{type === 'SALE' && platformConfig && price !== '' && (
+					<FeeBreakdown
+						price={Number(price)}
+						feePercent={platformConfig.feePercent}
+					/>
+				)}
 
 				{type === 'TRADE' && (
 					<div>

@@ -15,6 +15,7 @@ import {
 	FaCreditCard,
 	FaFlag,
 	FaGavel,
+	FaMoneyBillAlt,
 } from 'react-icons/fa';
 import { useAuthStore } from '../../store/authStore';
 import { signOut } from '../../lib/auth';
@@ -192,6 +193,13 @@ function ProfileMenuItems({ onClose }: { onClose: () => void }) {
 				Favoritos
 			</Link>
 			<Link
+				to="/perfil/compras"
+				onClick={onClose}
+				className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+			>
+				Minhas compras
+			</Link>
+			<Link
 				to="/perfil/kyc"
 				onClick={onClose}
 				className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
@@ -321,6 +329,13 @@ function MobileMenuItems({
 						className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
 					>
 						<FaHeart className="h-4 w-4" /> Favoritos
+					</Link>
+					<Link
+						to="/perfil/compras"
+						onClick={onClose}
+						className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+					>
+						<FaMoneyBillAlt className="h-4 w-4" /> Minhas compras
 					</Link>
 					<Link
 						to="/perfil/kyc"

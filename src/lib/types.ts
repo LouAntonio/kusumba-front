@@ -68,6 +68,9 @@ export interface User {
 	neighborhood?: string | null;
 	city?: string | null;
 	province?: string | null;
+	bankName?: string | null;
+	bankHolder?: string | null;
+	bankIban?: string | null;
 	accounts?: {
 		id: string;
 		providerId: string;
@@ -317,4 +320,74 @@ export const REPORT_TARGET_LABELS: Record<ReportTarget, string> = {
 	USER: 'Utilizador',
 	REVIEW: 'Avaliação',
 	MESSAGE: 'Mensagem',
+};
+
+export type PaymentStatus =
+	| 'PENDING'
+	| 'UNDER_REVIEW'
+	| 'APPROVED'
+	| 'RELEASED'
+	| 'REJECTED'
+	| 'CANCELLED';
+
+export interface PaymentRecipient {
+	id: string;
+	name: string;
+	surname?: string | null;
+	image: string | null;
+	bankName?: string | null;
+	bankHolder?: string | null;
+	bankIban?: string | null;
+}
+
+export interface PaymentItem {
+	id: string;
+	amount: number;
+	feePercent: number;
+	fee: number;
+	netToSeller: number;
+	status: PaymentStatus;
+	proofUrl?: string | null;
+	adminNote?: string | null;
+	reviewedAt?: string | null;
+	releasedAt?: string | null;
+	createdAt: string;
+	ad?: {
+		id: string;
+		slug: string;
+		title: string;
+		image: string | null;
+		price: number | null;
+	} | null;
+	buyer?: PaymentRecipient | null;
+	seller?: PaymentRecipient | null;
+	platformAccount?: PaymentPlatformAccount | null;
+}
+
+export interface PaymentPlatformAccount {
+	bankName: string;
+	bankHolder: string;
+	bankIban?: string | null;
+}
+
+export interface PlatformBankAccount {
+	id: string;
+	bankName: string;
+	bankHolder: string;
+	bankIban?: string | null;
+	isActive: boolean;
+	createdAt: string;
+}
+
+export interface PlatformConfig {
+	feePercent: number;
+}
+
+export const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
+	PENDING: 'A aguardar comprovativo',
+	UNDER_REVIEW: 'A analisar',
+	APPROVED: 'Aprovado',
+	RELEASED: 'Liberado',
+	REJECTED: 'Rejeitado',
+	CANCELLED: 'Cancelado',
 };

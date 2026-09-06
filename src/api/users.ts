@@ -22,6 +22,9 @@ export async function updateProfile(
 			| 'city'
 			| 'province'
 			| 'image'
+			| 'bankName'
+			| 'bankHolder'
+			| 'bankIban'
 		>
 	>,
 ): Promise<User> {
