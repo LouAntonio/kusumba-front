@@ -5,9 +5,11 @@ import { cn } from '../../lib/cn';
 export function Gallery({
 	images,
 	title,
+	closedLabel,
 }: {
 	images: string[];
 	title: string;
+	closedLabel?: string | null;
 }) {
 	const [index, setIndex] = useState(0);
 	const current = images[index];
@@ -30,8 +32,18 @@ export function Gallery({
 				<img
 					src={current}
 					alt={title}
-					className="h-full w-full object-cover"
+					className={cn(
+						'h-full w-full object-cover',
+						closedLabel && 'opacity-90 saturate-50',
+					)}
 				/>
+				{closedLabel && (
+					<div className="pointer-events-none absolute inset-0 flex items-center justify-center p-4">
+						<span className="rounded-2xl bg-slate-900/75 px-8 py-4 font-display text-2xl font-semibold uppercase tracking-wide text-white sm:text-3xl">
+							{closedLabel}
+						</span>
+					</div>
+				)}
 				{images.length > 1 && (
 					<>
 						<button

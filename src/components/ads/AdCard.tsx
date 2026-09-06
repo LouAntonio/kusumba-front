@@ -1,11 +1,11 @@
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { FaMapMarkerAlt } from 'react-icons/fa';
 import { Badge } from '../ui/Badge';
 import { Card } from '../ui/Card';
 import { RatingStars } from '../ui/RatingStars';
 import { FavoriteButton } from './FavoriteButton';
 import type { Ad } from '../../lib/types';
-import { AD_TYPE_LABELS } from '../../lib/types';
+import { AD_TYPE_LABELS, adClosedLabel } from '../../lib/types';
 import { formatDistance, formatKz, timeAgo } from '../../lib/format';
 import { cn } from '../../lib/cn';
 
@@ -23,9 +23,21 @@ export function AdCard({
 	const isDonation = ad.type === 'DONATION';
 	const isTrade = ad.type === 'TRADE';
 	const hasPrice = ad.price !== null && ad.price !== undefined;
+	const closedLabel = adClosedLabel(ad);
+	const [searchParams] = useSearchParams();
+	const linkLat = searchParams.get('lat');
+	const linkLng = searchParams.get('lng');
+	const linkTo =
+		linkLat && linkLng
+			? `/anuncios/${ad.slug}?lat=${linkLat}&lng=${linkLng}${
+					searchParams.has('radiusKm')
+						? `&radiusKm=${searchParams.get('radiusKm')}`
+						: ''
+				}`
+			: `/anuncios/${ad.slug}`;
 
 	return (
-		<Link to={`/anuncios/${ad.slug}`} className="group block">
+		<Link to={linkTo} className="group block">
 			<Card hover className={cn('h-full', className)}>
 				<div className="relative aspect-square w-full overflow-hidden bg-slate-100">
 					{ad.image ? (
@@ -33,7 +45,10 @@ export function AdCard({
 							src={ad.image}
 							alt={ad.title}
 							loading="lazy"
-							className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+							className={cn(
+								'h-full w-full object-cover transition-transform duration-300 group-hover:scale-105',
+								closedLabel && 'saturate-50',
+							)}
 						/>
 					) : (
 						<div className="flex h-full w-full items-center justify-center text-slate-300">
@@ -46,6 +61,13 @@ export function AdCard({
 					{ad.featured && (
 						<div className="absolute left-2 top-2">
 							<Badge tone="accent">Destaque</Badge>
+						</div>
+					)}
+					{closedLabel && (
+						<div className="absolute right-2 top-2">
+							<span className="inline-flex items-center gap-1 rounded-md bg-slate-900/80 px-2 py-1 text-xs font-semibold uppercase tracking-wide text-white">
+								{closedLabel}
+							</span>
 						</div>
 					)}
 					<div className="absolute bottom-2 left-2">

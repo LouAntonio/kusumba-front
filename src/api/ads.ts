@@ -36,12 +36,19 @@ export async function listAds(query: AdQuery = {}): Promise<Paginated<Ad>> {
 const UUID_RE =
 	/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export async function getAd(idOrSlug: string): Promise<Ad> {
+export async function getAd(
+	idOrSlug: string,
+	proximity?: { lat: number; lng: number } | null,
+): Promise<Ad> {
 	const isId = UUID_RE.test(idOrSlug);
 	const endpoint = isId
 		? `/api/ads/${idOrSlug}`
 		: `/api/ads/by-slug/${encodeURIComponent(idOrSlug)}`;
-	const { data } = await api.get<Ad>(endpoint);
+	const { data } = await api.get<Ad>(endpoint, {
+		params: proximity
+			? { lat: proximity.lat, lng: proximity.lng }
+			: undefined,
+	});
 	return data;
 }
 

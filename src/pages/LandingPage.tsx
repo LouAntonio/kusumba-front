@@ -64,6 +64,10 @@ const PILLARS = [
 	},
 ];
 
+const HERO_IMAGE =
+	import.meta.env.VITE_HOME_HERO_IMAGE ??
+	'https://images.unsplash.com/photo-1680801237121-13222ddd73ba?fm=jpg&q=80&w=2000&fit=crop';
+
 export function LandingPage() {
 	const { data: categories, isLoading: catsLoading } = useCategories();
 	const { data: featured, isLoading: featuredLoading } = useAds({
@@ -79,20 +83,26 @@ export function LandingPage() {
 	return (
 		<div className="space-y-16">
 			<section className="relative overflow-hidden rounded-3xl bg-sand">
-				<div className="grid gap-8 p-8 sm:p-12 lg:grid-cols-2 lg:items-center">
+				<div
+					aria-hidden
+					className="absolute inset-0 bg-cover bg-center"
+					style={{ backgroundImage: `url(${HERO_IMAGE})` }}
+				/>
+				<div className="absolute inset-0 bg-gradient-to-br from-[#0B1220]/85 via-[#0B1220]/65 to-[#0B1220]/80" />
+				<div className="relative grid min-h-[500px] gap-8 p-8 sm:p-12 lg:grid-cols-2 lg:items-center">
 					<div className="space-y-6">
-						<span className="inline-flex w-fit items-center gap-2 rounded-full bg-primary-100 px-3 py-1 text-xs font-semibold text-primary-800">
-							<FaMapMarkerAlt className="h-3 w-3" />
+						<span className="inline-flex w-fit items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/90 ring-1 ring-white/20">
+							<FaMapMarkerAlt className="h-3 w-3 text-amber-300" />
 							Hiperlocal · Luanda
 						</span>
-						<h1 className="font-display text-4xl leading-tight text-slate-900 sm:text-5xl">
+						<h1 className="font-display text-4xl leading-tight text-white sm:text-6xl">
 							Comprar. Vender. Trocar. Doar.
-							<span className="text-primary-600">
+							<span className="text-amber-300">
 								{' '}
 								Entre vizinhos.
 							</span>
 						</h1>
-						<p className="max-w-md text-lg text-slate-600">
+						<p className="max-w-md text-lg text-slate-200">
 							O marketPlace P2P hiperlocal de Luanda - sem frete,
 							com confiança comunitária e transações em horas.
 						</p>
@@ -100,13 +110,12 @@ export function LandingPage() {
 							<Button to="/anuncios" variant="accent" size="lg">
 								Explorar anúncios
 							</Button>
-							<Button
+							<Link
 								to="/anuncios/novo"
-								variant="outline"
-								size="lg"
+								className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-white/30 px-6 text-base font-medium text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B1220]"
 							>
 								Criar anúncio
-							</Button>
+							</Link>
 						</div>
 					</div>
 
@@ -117,15 +126,15 @@ export function LandingPage() {
 								<Link
 									key={mode.key}
 									to={mode.to}
-									className="group rounded-2xl border border-slate-200 bg-white p-5 transition hover:-translate-y-0.5 hover:shadow-md"
+									className="group rounded-2xl border border-white/15 bg-white/10 p-5 backdrop-blur-sm transition hover:-translate-y-0.5 hover:bg-white/20"
 								>
-									<div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-primary-50 text-primary-600 transition group-hover:bg-primary-600 group-hover:text-white">
+									<div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 text-amber-300 ring-1 ring-white/20 transition group-hover:bg-white/20 group-hover:text-amber-200">
 										<Icon className="h-5 w-5" />
 									</div>
-									<p className="font-display text-lg font-semibold text-slate-900">
+									<p className="font-display text-lg font-semibold text-white">
 										{mode.title}
 									</p>
-									<p className="mt-1 text-sm text-muted">
+									<p className="mt-1 text-sm text-white/70">
 										{mode.desc}
 									</p>
 								</Link>

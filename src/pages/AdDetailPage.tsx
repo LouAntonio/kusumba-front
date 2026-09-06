@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import {
+	Link,
+	useNavigate,
+	useParams,
+	useSearchParams,
+} from 'react-router-dom';
 import toast from 'react-hot-toast';
 import {
 	FaHeart,
@@ -31,7 +36,7 @@ import { Avatar } from '../components/ui/Avatar';
 import { ReportModal } from '../components/ui/ReportModal';
 import { AdReviews } from '../components/ads/AdReviews';
 import { ProofUploader } from '../components/payments/ProofUploader';
-import { AD_TYPE_LABELS, type AdType } from '../lib/types';
+import { adClosedLabel, AD_TYPE_LABELS, type AdType } from '../lib/types';
 import { formatKz, formatDistance, formatIban, timeAgo } from '../lib/format';
 
 function distanceMeters(
@@ -65,8 +70,16 @@ const MAPBOX_TOKEN = (
 export function AdDetailPage() {
 	const { slug } = useParams();
 	const navigate = useNavigate();
+	const [searchParams] = useSearchParams();
 	const user = useAuthStore((s) => s.user);
-	const { data: ad, isLoading, isError } = useAd(slug);
+	const latParam = searchParams.get('lat');
+	const lngParam = searchParams.get('lng');
+	const proximity =
+		latParam && lngParam
+			? { lat: Number(latParam), lng: Number(lngParam) }
+			: null;
+	const usingCenter = proximity !== null;
+	const { data: ad, isLoading, isError } = useAd(slug, proximity);
 	const [reportOpen, setReportOpen] = useState(false);
 	const [myCoords, setMyCoords] = useState<{
 		lat: number;
@@ -85,7 +98,7 @@ export function AdDetailPage() {
 	const geoUnsupported = !('geolocation' in navigator);
 
 	useEffect(() => {
-		if (!('geolocation' in navigator)) {
+		if (usingCenter || !('geolocation' in navigator)) {
 			return;
 		}
 		navigator.geolocation.getCurrentPosition(
@@ -97,7 +110,7 @@ export function AdDetailPage() {
 			() => setGeoDenied(true),
 			{ enableHighAccuracy: true, timeout: 10000 },
 		);
-	}, []);
+	}, [usingCenter]);
 
 	useEffect(() => {
 		if (!ad?.location || !MAPBOX_TOKEN) {
@@ -231,6 +244,8 @@ export function AdDetailPage() {
 		ad.visibility === 'VISIBLE' &&
 		ad.price != null;
 
+	const closedLabel = adClosedLabel(ad);
+
 	const handleBuy = () => {
 		if (!user) {
 			navigate('/entrar', { state: { from: `/anuncios/${ad.slug}` } });
@@ -279,7 +294,11 @@ export function AdDetailPage() {
 
 			<div className="grid gap-8 lg:grid-cols-[1.2fr_1fr]">
 				<div className="space-y-6">
-					<Gallery images={images} title={ad.title} />
+					<Gallery
+						images={images}
+						title={ad.title}
+						closedLabel={closedLabel}
+					/>
 
 					<Card className="p-5">
 						<h2 className="mb-3 font-display text-lg">Descrição</h2>
@@ -400,23 +419,30 @@ export function AdDetailPage() {
 										)}
 									</div>
 
-									{proximityMeters !== null && (
+									{proximityMeters !== null ||
+									(ad.distanceKm !== undefined &&
+										ad.distanceKm !== null) ? (
 										<div className="flex items-center gap-2 text-sm">
 											<span className="text-primary-600">
 												A{' '}
 												{formatDistance(
-													proximityMeters,
+													ad.distanceKm !==
+														undefined &&
+														ad.distanceKm !== null
+														? ad.distanceKm * 1000
+														: proximityMeters,
 												)}{' '}
 												de si
 											</span>
 										</div>
-									)}
-									{(geoDenied || geoUnsupported) && (
-										<p className="text-xs text-muted">
-											Ative a localização para ver a
-											distância até si.
-										</p>
-									)}
+									) : null}
+									{!usingCenter &&
+										(geoDenied || geoUnsupported) && (
+											<p className="text-xs text-muted">
+												Ative a localização para ver a
+												distância até si.
+											</p>
+										)}
 									{mapLink && (
 										<a
 											href={mapLink}
@@ -450,15 +476,6 @@ export function AdDetailPage() {
 												{ad.user.neighborhood}
 											</span>
 										)}
-										{ad.distanceKm !== undefined &&
-											ad.distanceKm !== null && (
-												<span>
-													•
-													{formatDistance(
-														ad.distanceKm * 1000,
-													)}
-												</span>
-											)}
 									</div>
 								</div>
 								{ad.user?.isVerified && (
@@ -471,6 +488,18 @@ export function AdDetailPage() {
 
 							{!isOwner && (
 								<div className="space-y-2 pt-2">
+									{closedLabel && (
+										<div className="flex items-start gap-2 rounded-xl bg-slate-100 p-3 text-sm text-slate-700">
+											<FaCheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" />
+											<p>
+												Este item já foi{' '}
+												<span className="font-semibold">
+													{closedLabel.toLowerCase()}
+												</span>
+												.
+											</p>
+										</div>
+									)}
 									{canBuy && activePayment && (
 										<Button
 											onClick={() => setBuyOpen(true)}

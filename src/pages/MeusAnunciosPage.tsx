@@ -19,7 +19,7 @@ import { useAuthStore } from '../store/authStore';
 import { setAdVisibility } from '../api/ads';
 import type { Ad } from '../lib/types';
 import { getApiError } from '../lib/axios';
-import { AD_STATUS_LABELS, AD_TYPE_LABELS } from '../lib/types';
+import { adClosedLabel, AD_STATUS_LABELS, AD_TYPE_LABELS } from '../lib/types';
 import { FeeBreakdown } from '../components/ads/FeeBreakdown';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
@@ -157,7 +157,8 @@ export function MeusAnunciosPage() {
 												: 'warning'
 										}
 									>
-										{AD_STATUS_LABELS[ad.status]}
+										{adClosedLabel(ad) ??
+											AD_STATUS_LABELS[ad.status]}
 									</Badge>
 									{ad.featured && (
 										<Badge tone="accent">Destaque</Badge>

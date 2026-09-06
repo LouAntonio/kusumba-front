@@ -305,6 +305,26 @@ export const AD_STATUS_LABELS: Record<AdStatus, string> = {
 	REJECTED: 'Rejeitado',
 };
 
+/** Rótulo de fecho apropriado ao tipo do anúncio: vendido, trocado ou doado. */
+export function adClosedLabel(ad: {
+	status: AdStatus;
+	type: AdType;
+}): string | null {
+	if (ad.status === 'TRADED') {
+		return 'Trocado';
+	}
+	if (ad.status === 'SOLD') {
+		if (ad.type === 'DONATION') {
+			return 'Doado';
+		}
+		if (ad.type === 'TRADE') {
+			return 'Trocado';
+		}
+		return 'Vendido';
+	}
+	return null;
+}
+
 export const REPORT_REASON_LABELS: Record<ReportReason, string> = {
 	SPAM: 'Spam',
 	FRAUD: 'Fraude',

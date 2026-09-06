@@ -20,10 +20,13 @@ export function useAds(query: AdQuery = {}) {
 	});
 }
 
-export function useAd(idOrSlug: string | undefined) {
+export function useAd(
+	idOrSlug: string | undefined,
+	proximity?: { lat: number; lng: number } | null,
+) {
 	return useQuery({
-		queryKey: ['ad', idOrSlug],
-		queryFn: () => getAd(idOrSlug as string),
+		queryKey: ['ad', idOrSlug, proximity],
+		queryFn: () => getAd(idOrSlug as string, proximity),
 		enabled: Boolean(idOrSlug),
 	});
 }
