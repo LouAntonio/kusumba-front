@@ -18,7 +18,8 @@ import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Skeleton } from '../components/ui/Skeleton';
-import { formatKz, formatDate } from '../lib/format';
+import { ProofUploader } from '../components/payments/ProofUploader';
+import { formatKz, formatDate, formatIban } from '../lib/format';
 import { cn } from '../lib/cn';
 
 const STATUS_TONES: Record<
@@ -253,29 +254,21 @@ function ProofModal({
 	onClose: () => void;
 }) {
 	const submitProof = useSubmitProof();
-	const [fileName, setFileName] = useState('');
 
 	const handleFile = async (file: File) => {
 		try {
 			const uploaded = await uploadImage(file, {
 				folder: 'comprovativos',
 			});
-			submitProof.mutate(
-				{
-					id: item.id,
-					proofUrl: uploaded.url,
-					proofId: uploaded.cloudinaryId,
-				},
-				{
-					onSuccess: () => {
-						toast.success(
-							'Comprovativo enviado. Ficará a aguardar verificação.',
-						);
-						onClose();
-					},
-					onError: (error) => toast.error(getApiError(error)),
-				},
+			await submitProof.mutateAsync({
+				id: item.id,
+				proofUrl: uploaded.url,
+				proofId: uploaded.cloudinaryId,
+			});
+			toast.success(
+				'Comprovativo enviado. Ficará a aguardar verificação.',
 			);
+			onClose();
 		} catch (error) {
 			toast.error(getApiError(error));
 		}
@@ -325,7 +318,7 @@ function ProofModal({
 						<p>Titular: {item.platformAccount.bankHolder}</p>
 						{item.platformAccount.bankIban && (
 							<p className="font-mono text-xs text-muted">
-								{item.platformAccount.bankIban}
+								{formatIban(item.platformAccount.bankIban)}
 							</p>
 						)}
 						<p className="mt-2 border-t border-slate-200 pt-2">
@@ -337,33 +330,10 @@ function ProofModal({
 					</div>
 				)}
 
-				<label className="block cursor-pointer rounded-xl border-2 border-dashed border-slate-300 p-4 text-center text-sm text-slate-500 hover:border-primary-400 hover:text-primary-600">
-					<input
-						type="file"
-						accept="image/*"
-						disabled={submitProof.isPending}
-						className="hidden"
-						onChange={(e) => {
-							const file = e.target.files?.[0];
-							if (!file) {
-								return;
-							}
-							if (!file.type.startsWith('image/')) {
-								toast.error(
-									'O comprovativo deve ser uma imagem.',
-								);
-								return;
-							}
-							setFileName(file.name);
-							void handleFile(file);
-						}}
-					/>
-					{fileName
-						? submitProof.isPending
-							? 'A enviar comprovativo…'
-							: fileName
-						: 'Escolher comprovativo…'}
-				</label>
+				<ProofUploader
+					onUpload={handleFile}
+					busy={submitProof.isPending}
+				/>
 			</div>
 		</div>
 	);

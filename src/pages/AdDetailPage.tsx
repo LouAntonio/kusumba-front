@@ -30,8 +30,9 @@ import { RatingStars } from '../components/ui/RatingStars';
 import { Avatar } from '../components/ui/Avatar';
 import { ReportModal } from '../components/ui/ReportModal';
 import { AdReviews } from '../components/ads/AdReviews';
+import { ProofUploader } from '../components/payments/ProofUploader';
 import { AD_TYPE_LABELS, type AdType } from '../lib/types';
-import { formatKz, formatDistance, timeAgo } from '../lib/format';
+import { formatKz, formatDistance, formatIban, timeAgo } from '../lib/format';
 
 function distanceMeters(
 	a: { lat: number; lng: number },
@@ -252,21 +253,14 @@ export function AdDetailPage() {
 			const uploaded = await uploadImage(file, {
 				folder: 'comprovativos',
 			});
-			submitProof.mutate(
-				{
-					id: activePayment.id,
-					proofUrl: uploaded.url,
-					proofId: uploaded.cloudinaryId,
-				},
-				{
-					onSuccess: (payment) => {
-						setActivePayment(payment);
-						toast.success(
-							'Comprovativo enviado. Ficará a aguardar verificação.',
-						);
-					},
-					onError: (error) => toast.error(getApiError(error)),
-				},
+			const payment = await submitProof.mutateAsync({
+				id: activePayment.id,
+				proofUrl: uploaded.url,
+				proofId: uploaded.cloudinaryId,
+			});
+			setActivePayment(payment);
+			toast.success(
+				'Comprovativo enviado. Ficará a aguardar verificação.',
 			);
 		} catch (error) {
 			toast.error(getApiError(error));
@@ -612,17 +606,17 @@ export function AdDetailPage() {
 											{activePayment.platformAccount
 												.bankIban && (
 												<p className="font-mono text-xs">
-													{
+													{formatIban(
 														activePayment
 															.platformAccount
-															.bankIban
-													}
+															.bankIban,
+													)}
 												</p>
 											)}
 										</div>
 									</div>
 									<ProofUploader
-										onFile={handleProofFile}
+										onUpload={handleProofFile}
 										busy={submitProof.isPending}
 									/>
 								</div>
@@ -659,7 +653,7 @@ export function AdDetailPage() {
 										'O comprovativo foi recusado. Envie novamente com os dados corretos.'}
 								</p>
 								<ProofUploader
-									onFile={handleProofFile}
+									onUpload={handleProofFile}
 									busy={submitProof.isPending}
 								/>
 							</div>
@@ -682,50 +676,6 @@ export function AdDetailPage() {
 					</div>
 				</div>
 			)}
-		</div>
-	);
-}
-
-function ProofUploader({
-	onFile,
-	busy,
-}: {
-	onFile: (file: File) => void;
-	busy: boolean;
-}) {
-	const [fileName, setFileName] = useState('');
-	const [error, setError] = useState('');
-
-	return (
-		<div className="space-y-2">
-			<label className="block cursor-pointer rounded-xl border-2 border-dashed border-slate-300 p-4 text-center text-sm text-slate-500 hover:border-primary-400 hover:text-primary-600">
-				<input
-					type="file"
-					accept="image/*"
-					disabled={busy}
-					className="hidden"
-					onChange={(e) => {
-						const file = e.target.files?.[0];
-						if (!file) {
-							return;
-						}
-						if (!file.type.startsWith('image/')) {
-							setError('O comprovativo deve ser uma imagem.');
-							setFileName('');
-							return;
-						}
-						setError('');
-						setFileName(file.name);
-						onFile(file);
-					}}
-				/>
-				{fileName
-					? busy
-						? 'A enviar comprovativo…'
-						: fileName
-					: 'Escolher comprovativo…'}
-			</label>
-			{error && <p className="text-xs text-red-600">{error}</p>}
 		</div>
 	);
 }

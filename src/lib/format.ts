@@ -19,6 +19,19 @@ export function formatKz(value: number | null | undefined): string {
 	return `${new Intl.NumberFormat('pt-AO').format(value)} Kz`;
 }
 
+export function formatIban(iban: string | null | undefined): string {
+	if (!iban) {
+		return '';
+	}
+	return (
+		iban
+			.replace(/[^A-Za-z0-9]/g, '')
+			.toUpperCase()
+			.match(/.{1,4}/g)
+			?.join('.') ?? ''
+	);
+}
+
 export function formatDate(iso: string | null | undefined): string {
 	if (!iso) {
 		return '-';

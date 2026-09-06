@@ -23,7 +23,7 @@ export async function submitProof(
 	id: string,
 	input: { proofUrl: string; proofId: string },
 ): Promise<PaymentItem> {
-	const { data } = await api.patch<PaymentItem>(
+	const { data } = await api.post<PaymentItem>(
 		`/api/payments/${id}/proof`,
 		input,
 	);

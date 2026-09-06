@@ -22,7 +22,7 @@ api.interceptors.request.use((config) => {
 });
 
 export interface ApiErrorPayload {
-	message?: string;
+	message?: string | string[];
 	error?: string;
 	statusCode?: number;
 }
@@ -33,6 +33,9 @@ export function getApiError(error: unknown): string {
 		const payload = axiosError.response?.data;
 		if (typeof payload?.message === 'string') {
 			return payload.message;
+		}
+		if (Array.isArray(payload?.message) && payload.message.length > 0) {
+			return payload.message[0];
 		}
 		if (typeof payload?.error === 'string') {
 			return payload.error;

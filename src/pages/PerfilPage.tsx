@@ -22,6 +22,7 @@ import {
 	unlinkGoogle,
 } from '../lib/auth';
 import { getApiError } from '../lib/axios';
+import { formatIban } from '../lib/format';
 import { Avatar } from '../components/ui/Avatar';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
@@ -360,12 +361,15 @@ export function PerfilPage() {
 									placeholder="Nome completo do titular"
 								/>
 								<Input
-									label="IBAN / número de conta"
+									label="IBAN"
 									value={bankIban ?? ''}
 									onChange={(e) =>
-										setBankIban(e.target.value.slice(0, 40))
+										setBankIban(e.target.value)
 									}
-									placeholder="Ex.: 001640028644562"
+									onBlur={(e) =>
+										setBankIban(formatIban(e.target.value))
+									}
+									placeholder="AO06.0055.0000.9134.2456.1019.4"
 									className="sm:col-span-2"
 								/>
 							</div>
@@ -407,7 +411,7 @@ export function PerfilPage() {
 							{profile.bankHolder && <p>{profile.bankHolder}</p>}
 							{profile.bankIban && (
 								<p className="font-mono text-xs text-muted">
-									{profile.bankIban}
+									{formatIban(profile.bankIban)}
 								</p>
 							)}
 						</div>
