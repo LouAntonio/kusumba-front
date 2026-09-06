@@ -4,6 +4,7 @@ import { getSession } from '../lib/auth';
 import { getMe } from '../api/users';
 import { useAuthStore } from '../store/authStore';
 import { connectSocket, disconnectSocket } from '../lib/socket';
+import { getToken } from '../lib/token';
 import { useChatStore } from '../store/chatStore';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -46,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 	useEffect(() => {
 		if (user) {
-			connectSocket();
+			connectSocket(getToken());
 		} else {
 			disconnectSocket();
 			resetChat();

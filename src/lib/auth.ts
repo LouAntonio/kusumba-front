@@ -1,10 +1,12 @@
 import { api } from './axios';
 import type { User } from './types';
+import { setToken, clearToken } from './token';
 
 export type SessionUser = User;
 
 export interface GetSessionResponse {
 	user: User;
+	token?: string;
 	session: {
 		id: string;
 		token: string;
@@ -18,8 +20,10 @@ export async function getSession(): Promise<GetSessionResponse | null> {
 		const { data } = await api.get<GetSessionResponse>(
 			'/api/auth/get-session',
 		);
+		setToken(data.session?.token ?? null);
 		return data;
 	} catch {
+		clearToken();
 		return null;
 	}
 }
@@ -36,11 +40,16 @@ export async function requestMagicLink(
 
 export async function verifyMagicLink(
 	token: string,
-): Promise<{ status: boolean }> {
-	const { data } = await api.post<{ status: boolean }>(
-		'/api/auth/magic-link/verify',
-		{ token },
-	);
+): Promise<{ status: boolean; sessionToken?: string }> {
+	const { data } = await api.post<{
+		status: boolean;
+		sessionToken?: string;
+	}>('/api/auth/magic-link/verify', { token });
+	if (data.sessionToken) {
+		setToken(data.sessionToken);
+	} else {
+		clearToken();
+	}
 	return data;
 }
 
@@ -58,11 +67,16 @@ export async function signInWithGoogleIdToken(
 			},
 		},
 	);
+	setToken(data.token ?? null);
 	return data;
 }
 
 export async function signOut(): Promise<void> {
-	await api.post('/api/auth/sign-out');
+	try {
+		await api.post('/api/auth/sign-out');
+	} finally {
+		clearToken();
+	}
 }
 
 export async function signUp(
@@ -76,6 +90,7 @@ export async function signUp(
 		'/api/auth/sign-up/email',
 		{ name, surname, email, password, province },
 	);
+	setToken(data.token ?? null);
 	return data;
 }
 
@@ -87,6 +102,7 @@ export async function signInEmail(
 		'/api/auth/sign-in/email',
 		{ email, password },
 	);
+	setToken(data.token ?? null);
 	return data;
 }
 

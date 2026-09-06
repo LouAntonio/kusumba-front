@@ -1,4 +1,5 @@
 import axios, { AxiosError } from 'axios';
+import { getToken } from './token';
 
 export const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
 
@@ -10,6 +11,14 @@ export const api = axios.create({
 	headers: {
 		'Content-Type': 'application/json',
 	},
+});
+
+api.interceptors.request.use((config) => {
+	const token = getToken();
+	if (token) {
+		config.headers.set('Authorization', `Bearer ${token}`);
+	}
+	return config;
 });
 
 export interface ApiErrorPayload {

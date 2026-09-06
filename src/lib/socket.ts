@@ -1,5 +1,6 @@
 import { io, Socket } from 'socket.io-client';
 import { SOCKET_URL } from './axios';
+import { getToken } from './token';
 
 let socket: Socket | null = null;
 
@@ -12,10 +13,12 @@ export function connectSocket(token?: string | null): Socket {
 		return socket;
 	}
 
+	const authToken = token ?? getToken();
+
 	socket = io(SOCKET_URL, {
 		withCredentials: true,
 		transports: ['websocket', 'polling'],
-		auth: token ? { token } : {},
+		auth: authToken ? { token: authToken } : {},
 		autoConnect: true,
 	});
 
