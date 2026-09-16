@@ -95,7 +95,7 @@ export function MeusAnunciosPage() {
 						Gira os seus anúncios publicados.
 					</p>
 				</div>
-				<Button to="/anuncios/novo" variant="accent" cta>
+				<Button to="/anuncios/novo" variant="accent">
 					<FaPlus className="h-4 w-4" /> Criar anúncio
 				</Button>
 			</div>

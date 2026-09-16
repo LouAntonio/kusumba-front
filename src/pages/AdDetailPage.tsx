@@ -18,7 +18,7 @@ import {
 	FaTimes,
 	FaMoneyBillAlt,
 } from 'react-icons/fa';
-import { useAd } from '../hooks/useAds';
+import { useAd, useAds } from '../hooks/useAds';
 import { useWishlistCheck, useToggleWishlist } from '../hooks/useWishlist';
 import { useCreateConversation } from '../hooks/useChat';
 import { useCreatePayment, useSubmitProof } from '../hooks/usePayments';
@@ -30,6 +30,7 @@ import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Gallery } from '../components/ads/Gallery';
+import { AdCard } from '../components/ads/AdCard';
 import { Skeleton } from '../components/ui/Skeleton';
 import { RatingStars } from '../components/ui/RatingStars';
 import { Avatar } from '../components/ui/Avatar';
@@ -148,6 +149,16 @@ export function AdDetailPage() {
 	const createConversation = useCreateConversation();
 	const createPayment = useCreatePayment();
 	const submitProof = useSubmitProof();
+
+	const categorySlugs =
+		ad?.categories?.map((category) => category.slug).join(',') ?? '';
+	const { data: similarData } = useAds(
+		categorySlugs ? { categorySlugs, limit: 5 } : {},
+	);
+	const similarAds =
+		similarData?.items
+			?.filter((similar) => similar.id !== ad?.id)
+			.slice(0, 4) ?? [];
 
 	if (isLoading) {
 		return (
@@ -565,6 +576,27 @@ export function AdDetailPage() {
 					</Card>
 				</div>
 			</div>
+
+			{similarAds.length > 0 && (
+				<section>
+					<div className="mb-4 flex items-end justify-between gap-4">
+						<h2 className="font-display text-lg">
+							Anúncios similares
+						</h2>
+						<Link
+							to={`/anuncios?categorySlugs=${categorySlugs}`}
+							className="text-sm font-medium text-primary-600 hover:text-primary-700"
+						>
+							Ver todos
+						</Link>
+					</div>
+					<div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+						{similarAds.map((similar) => (
+							<AdCard key={similar.id} ad={similar} />
+						))}
+					</div>
+				</section>
+			)}
 
 			<ReportModal
 				open={reportOpen}
