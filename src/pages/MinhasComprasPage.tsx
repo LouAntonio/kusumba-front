@@ -120,7 +120,9 @@ export function MinhasComprasPage() {
 					}
 					action={
 						role === 'buyer' ? (
-							<Button to="/anuncios">Encontrar o que comprar</Button>
+							<Button to="/anuncios">
+								Encontrar o que comprar
+							</Button>
 						) : (
 							<Button to="/anuncios">Ver meus anúncios</Button>
 						)

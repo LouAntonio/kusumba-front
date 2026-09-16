@@ -23,6 +23,7 @@ import {
 } from 'react-icons/fa';
 import { useAuthStore } from '../../store/authStore';
 import { signOut } from '../../lib/auth';
+import toast from 'react-hot-toast';
 import { Logo } from './Logo';
 import { Button } from '../ui/Button';
 import { Avatar } from '../ui/Avatar';
@@ -186,7 +187,9 @@ function ProfileMenuItems({ onClose }: { onClose: () => void }) {
 		try {
 			await signOut();
 		} catch {
-			// ignore - clear local session regardless
+			toast.error(
+				'Não foi possível terminar a sessão no servidor. A sessão local foi encerrada.',
+			);
 		}
 		clear();
 		navigate('/');
@@ -308,7 +311,9 @@ function MobileMenuItems({
 		try {
 			await signOut();
 		} catch {
-			// ignore - clear local session regardless
+			toast.error(
+				'Não foi possível terminar a sessão no servidor. A sessão local foi encerrada.',
+			);
 		}
 		clear();
 		onClose();
