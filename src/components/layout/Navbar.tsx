@@ -16,6 +16,8 @@ import {
 	FaFlag,
 	FaGavel,
 	FaMoneyBillAlt,
+	FaCompass,
+	FaEnvelope,
 } from 'react-icons/fa';
 import { useAuthStore } from '../../store/authStore';
 import { signOut } from '../../lib/auth';
@@ -61,6 +63,18 @@ export function Navbar() {
 						className="rounded-lg bg-slate-100 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
 					>
 						Explorar
+					</Link>
+					<Link
+						to="/como-funciona"
+						className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+					>
+						Como funciona
+					</Link>
+					<Link
+						to="/contacto"
+						className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+					>
+						Contacto
 					</Link>
 					{user && (
 						<>
@@ -292,6 +306,20 @@ function MobileMenuItems({
 				className="rounded-lg bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
 			>
 				Explorar
+			</Link>
+			<Link
+				to="/como-funciona"
+				onClick={onClose}
+				className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+			>
+				<FaCompass className="h-4 w-4" /> Como funciona
+			</Link>
+			<Link
+				to="/contacto"
+				onClick={onClose}
+				className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+			>
+				<FaEnvelope className="h-4 w-4" /> Contacto
 			</Link>
 			{user ? (
 				<>

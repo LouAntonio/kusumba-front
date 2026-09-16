@@ -1,5 +1,5 @@
 import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaCheck, FaCrown } from 'react-icons/fa';
 import { usePlans } from '../hooks/usePlans';
 import { useAuthStore } from '../store/authStore';
@@ -119,12 +119,12 @@ export function PlanosPage() {
 				<p className="text-center text-xs text-muted">
 					Assinaturas são geradas a pedido. A sua assinatura atual e a
 					data de expiração podem ser consultadas na página{' '}
-					<a
-						href="/assinatura"
+					<Link
+						to="/assinatura"
 						className="text-primary-600 hover:underline"
 					>
 						Minha assinatura
-					</a>
+					</Link>
 					.
 				</p>
 			)}

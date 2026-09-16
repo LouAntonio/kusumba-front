@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react';
+import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import {
 	FaMapMarkerAlt,
@@ -281,12 +282,12 @@ export function ContactPage() {
 						<div className="flex items-center justify-between gap-3 sm:col-span-2">
 							<p className="text-xs text-muted">
 								Ao enviar, concorda com a nossa{' '}
-								<a
-									href="/politicas"
+								<Link
+									to="/politicas"
 									className="text-primary-600 hover:underline"
 								>
 									política de privacidade
-								</a>
+								</Link>
 								.
 							</p>
 							<Button

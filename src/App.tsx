@@ -28,6 +28,7 @@ import { AboutPage } from './pages/AboutPage';
 import { ContactPage } from './pages/ContactPage';
 import { PoliciesPage } from './pages/PoliciesPage';
 import { TermsPage } from './pages/TermsPage';
+import { ComoFuncionaPage } from './pages/ComoFuncionaPage';
 
 const router = createBrowserRouter([
 	{
@@ -147,6 +148,7 @@ const router = createBrowserRouter([
 				),
 			},
 			{ path: '/planos', element: <PlanosPage /> },
+			{ path: '/como-funciona', element: <ComoFuncionaPage /> },
 			{ path: '/sobre', element: <AboutPage /> },
 			{ path: '/contacto', element: <ContactPage /> },
 			{ path: '/politicas', element: <PoliciesPage /> },

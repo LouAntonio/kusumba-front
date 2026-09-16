@@ -12,6 +12,7 @@ const pathLabels: Record<string, string> = {
 	perfil: 'Perfil',
 	mensagens: 'Mensagens',
 	planos: 'Planos',
+	'como-funciona': 'Como funciona',
 	assinatura: 'Assinatura',
 	sobre: 'Sobre',
 	contacto: 'Contacto',
