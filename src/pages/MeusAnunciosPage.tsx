@@ -95,7 +95,7 @@ export function MeusAnunciosPage() {
 						Gira os seus anúncios publicados.
 					</p>
 				</div>
-				<Button to="/anuncios/novo" variant="accent">
+				<Button to="/anuncios/novo" variant="accent" cta>
 					<FaPlus className="h-4 w-4" /> Criar anúncio
 				</Button>
 			</div>
@@ -165,6 +165,11 @@ export function MeusAnunciosPage() {
 									)}
 									{ad.visibility === 'HIDDEN' && (
 										<Badge tone="neutral">Oculto</Badge>
+									)}
+									{!ad.verified && (
+										<Badge tone="warning">
+											Pendente de aprovação
+										</Badge>
 									)}
 								</div>
 								<p className="mt-1 font-mono text-sm font-semibold text-slate-900">

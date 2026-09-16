@@ -74,9 +74,9 @@ export function SubscriptionPage() {
 						visibilidade.
 					</p>
 					<div className="mt-5">
-						<Button to="/planos" variant="accent">
-							Ver planos
-						</Button>
+<Button to="/planos" variant="accent" cta>
+						Ver planos
+					</Button>
 					</div>
 				</Card>
 			) : (
