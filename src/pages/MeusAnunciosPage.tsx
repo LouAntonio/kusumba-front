@@ -96,7 +96,7 @@ export function MeusAnunciosPage() {
 					</p>
 				</div>
 				<Button to="/anuncios/novo" variant="accent">
-					<FaPlus className="h-4 w-4" /> Criar anúncio
+					<FaPlus className="h-4 w-4" /> Publicar
 				</Button>
 			</div>
 
@@ -120,7 +120,11 @@ export function MeusAnunciosPage() {
 				<EmptyState
 					title="Ainda não publicou anúncios"
 					description="Crie o seu primeiro anúncio e comece a vender, trocar ou doar entre vizinhos."
-					action={<Button to="/anuncios/novo">Criar anúncio</Button>}
+					action={
+						<Button to="/anuncios/novo">
+							Publicar o primeiro anúncio
+						</Button>
+					}
 				/>
 			) : (
 				<div className="space-y-3">

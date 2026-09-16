@@ -75,7 +75,7 @@ export function SubscriptionPage() {
 					</p>
 					<div className="mt-5">
 						<Button to="/planos" variant="accent">
-							Ver planos
+							Conhecer o Kusumba Pass
 						</Button>
 					</div>
 				</Card>

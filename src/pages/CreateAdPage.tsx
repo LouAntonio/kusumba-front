@@ -66,12 +66,12 @@ export function CreateAdPage() {
 						comprovar a sua identidade (KYC) antes de publicar um
 						anúncio.
 					</p>
-					<Button to="/perfil/kyc">Concluir verificação</Button>
+					<Button to="/perfil/kyc">Comprovar a minha identidade</Button>
 					<Link
 						to="/anuncios"
 						className="text-sm font-medium text-primary-600 hover:underline"
 					>
-						Voltar a explorar
+						Ver anúncios
 					</Link>
 				</Card>
 			)}

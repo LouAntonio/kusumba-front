@@ -143,7 +143,7 @@ export function LandingPage() {
 						to="/anuncios"
 						className="text-sm font-medium text-primary-600 hover:text-primary-700"
 					>
-						Ver tudo →
+						Ver todos os anúncios →
 					</Link>
 				</div>
 				{catsLoading ? (
@@ -239,7 +239,7 @@ export function LandingPage() {
 								variant="accent"
 								size="md"
 							>
-								Criar anúncio grátis
+								Publicar grátis em 2 minutos
 							</Button>
 							<Button
 								to="/anuncios"
@@ -247,14 +247,14 @@ export function LandingPage() {
 								size="md"
 								className="border-white/30 bg-transparent text-white hover:bg-white/10 hover:border-white/50 hover:text-white"
 							>
-								Explorar anúncios
+								Ver o que os vizinhos vendem
 							</Button>
 						</div>
 						<Link
 							to="/como-funciona"
 							className="inline-flex items-center gap-2 text-sm font-medium text-amber-300 transition-colors hover:text-amber-200"
 						>
-							Ver como funciona
+							Como funciona, em 4 passos
 							<FaArrowRight className="h-3.5 w-3.5" />
 						</Link>
 					</div>

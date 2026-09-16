@@ -32,7 +32,7 @@ export function FavoritosPage() {
 					description="Quando encontrar algo que goste, toque no coração para o guardar aqui."
 					action={
 						<Button to="/anuncios" variant="accent">
-							Explorar anúncios
+							Ver anúncios perto de si
 						</Button>
 					}
 				/>

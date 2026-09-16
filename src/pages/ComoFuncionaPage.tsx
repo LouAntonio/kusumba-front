@@ -179,7 +179,7 @@ export function ComoFuncionaPage() {
 					</div>
 					<div className="flex flex-wrap gap-3">
 						<Button to="/anuncios/novo" variant="accent" size="lg">
-							Criar anúncio
+							Publicar o meu primeiro anúncio
 						</Button>
 						<Button
 							to="/anuncios"
@@ -187,7 +187,7 @@ export function ComoFuncionaPage() {
 							size="lg"
 							className="border-white/30 bg-transparent text-white hover:bg-white/10 hover:border-white/50 hover:text-white"
 						>
-							Explorar anúncios
+							Ver ofertas de vizinhos
 						</Button>
 					</div>
 				</div>

@@ -193,10 +193,10 @@ export function TermsPage() {
 					cópia para referência futura. Para questões jurídicas,
 					escreva para{' '}
 					<a
-						href="mailto:juridico@kusumba.ao"
+						href="mailto:juridico@kusumba.com"
 						className="font-medium text-primary-700 underline"
 					>
-						juridico@kusumba.ao
+						juridico@kusumba.com
 					</a>
 					.
 				</p>

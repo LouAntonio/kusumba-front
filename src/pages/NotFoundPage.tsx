@@ -10,7 +10,7 @@ export function NotFoundPage() {
 			<p className="max-w-sm text-muted">
 				A página que procura não existe ou foi movida.
 			</p>
-			<Button to="/">Voltar ao início</Button>
+			<Button to="/">Ir para a página inicial</Button>
 		</div>
 	);
 }

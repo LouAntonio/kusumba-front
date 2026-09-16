@@ -70,7 +70,7 @@ export function PublicProfilePage() {
 					inativa.
 				</p>
 				<Button to="/anuncios" variant="outline" className="mt-6">
-					Voltar a explorar
+					Ver outros anúncios
 				</Button>
 			</div>
 		);
@@ -155,7 +155,7 @@ export function PublicProfilePage() {
 							<FaUserPlus className="h-4 w-4" />
 							{createConversation.isPending
 								? 'A abrir…'
-								: 'Mensagem'}
+								: 'Enviar mensagem'}
 						</Button>
 					)}
 				</div>

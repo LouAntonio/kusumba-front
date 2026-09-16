@@ -208,7 +208,7 @@ export function AdDetailPage() {
 					Pode ter sido removido ou oculto.
 				</p>
 				<Button to="/anuncios" variant="outline" className="mt-6">
-					Voltar a explorar
+					Ver outros anúncios
 				</Button>
 			</div>
 		);
@@ -546,7 +546,7 @@ export function AdDetailPage() {
 										<FaCommentDots className="h-4 w-4" />
 										{createConversation.isPending
 											? 'A abrir…'
-											: 'Contactar'}
+											: 'Falar com o vendedor'}
 									</Button>
 									<Button
 										onClick={handleFavorite}
@@ -587,7 +587,7 @@ export function AdDetailPage() {
 							to={`/anuncios?categorySlugs=${categorySlugs}`}
 							className="text-sm font-medium text-primary-600 hover:text-primary-700"
 						>
-							Ver todos
+							Ver mais como este
 						</Link>
 					</div>
 					<div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">

@@ -90,14 +90,14 @@ export function AboutPage() {
 						</p>
 						<div className="flex flex-wrap gap-3 pt-2">
 							<Button to="/anuncios" variant="accent" size="lg">
-								Explorar anúncios
+								Ver anúncios perto de si
 							</Button>
 							<Button
 								to="/anuncios/novo"
 								variant="outline"
 								size="lg"
 							>
-								Criar anúncio
+								Publicar o que já não usa
 							</Button>
 						</div>
 					</div>

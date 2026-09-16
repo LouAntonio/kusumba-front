@@ -52,7 +52,7 @@ export function MensagensPage() {
 					icon={<FaCommentDots />}
 					title="Sem mensagens"
 					description="Quando alguém contactar sobre um anúncio, a conversa aparece aqui."
-					action={<Button to="/anuncios">Explorar anúncios</Button>}
+					action={<Button to="/anuncios">Ver anúncios</Button>}
 				/>
 			) : (
 				<div className="space-y-3">

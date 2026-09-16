@@ -118,7 +118,13 @@ export function MinhasComprasPage() {
 							? 'Ao comprar um anúncio "Venda" com pagamento por transferência, acompanhe aqui o estado.'
 							: 'Quando alguém comprar o seu anúncio, acompanhe aqui o pagamento.'
 					}
-					action={<Button to="/anuncios">Explorar anúncios</Button>}
+					action={
+						role === 'buyer' ? (
+							<Button to="/anuncios">Encontrar o que comprar</Button>
+						) : (
+							<Button to="/anuncios">Ver meus anúncios</Button>
+						)
+					}
 				/>
 			) : (
 				<div className="space-y-3">

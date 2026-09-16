@@ -28,7 +28,7 @@ const SECTIONS = [
 			},
 			{
 				h: 'Os seus direitos',
-				p: 'Pode pedir acesso, correção ou eliminação dos seus dados a qualquer momento, enviando um email para privacidade@kusumba.ao.',
+				p: 'Pode pedir acesso, correção ou eliminação dos seus dados a qualquer momento, enviando um email para privacidade@kusumba.com.',
 			},
 		],
 	},
@@ -107,7 +107,7 @@ const SECTIONS = [
 			},
 			{
 				h: 'Como pedir',
-				p: 'Envie o pedido para financas@kusumba.ao com o ID da assinatura. Processamos em até 5 dias úteis.',
+				p: 'Envie o pedido para financas@kusumba.com com o ID da assinatura. Processamos em até 5 dias úteis.',
 			},
 		],
 	},
@@ -250,10 +250,10 @@ export function PoliciesPage() {
 						<p className="mt-1 text-primary-900/80">
 							Escreva para{' '}
 							<a
-								href="mailto:privacidade@kusumba.ao"
+								href="mailto:privacidade@kusumba.com"
 								className="font-medium underline"
 							>
-								privacidade@kusumba.ao
+								privacidade@kusumba.com
 							</a>{' '}
 							ou use o formulário de contacto. Respondemos em até
 							24 horas úteis.

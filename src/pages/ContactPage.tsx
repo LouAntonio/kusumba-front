@@ -141,7 +141,7 @@ export function ContactPage() {
 										Email
 									</dt>
 									<dd className="text-muted">
-										ola@kusumba.ao
+										geral@kusumba.com
 									</dd>
 								</div>
 							</div>
@@ -167,7 +167,7 @@ export function ContactPage() {
 								WhatsApp
 							</Button>
 							<Button
-								to="mailto:ola@kusumba.ao"
+								to="mailto:geral@kusumba.com"
 								variant="ghost"
 								size="sm"
 							>
@@ -187,10 +187,10 @@ export function ContactPage() {
 									Suporte técnico
 								</span>
 								<a
-									href="mailto:suporte@kusumba.ao"
+									href="mailto:suporte@kusumba.com"
 									className="font-mono text-xs text-primary-600 hover:underline"
 								>
-									suporte@kusumba.ao
+									suporte@kusumba.com
 								</a>
 							</li>
 							<li className="flex items-center justify-between gap-3 border-b border-slate-100 pb-3">
@@ -198,19 +198,19 @@ export function ContactPage() {
 									Denúncias
 								</span>
 								<a
-									href="mailto:denuncias@kusumba.ao"
+									href="mailto:denuncias@kusumba.com"
 									className="font-mono text-xs text-primary-600 hover:underline"
 								>
-									denuncias@kusumba.ao
+									denuncias@kusumba.com
 								</a>
 							</li>
 							<li className="flex items-center justify-between gap-3">
 								<span className="text-slate-700">Imprensa</span>
 								<a
-									href="mailto:imprensa@kusumba.ao"
+									href="mailto:imprensa@kusumba.com"
 									className="font-mono text-xs text-primary-600 hover:underline"
 								>
-									imprensa@kusumba.ao
+									imprensa@kusumba.com
 								</a>
 							</li>
 						</ul>
