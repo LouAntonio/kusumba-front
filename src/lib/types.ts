@@ -157,6 +157,7 @@ export interface AdQuery {
 	city?: string;
 	neighborhood?: string;
 	includeInactive?: boolean;
+	includeClosed?: boolean;
 	featured?: boolean;
 	userId?: string;
 	lat?: number;

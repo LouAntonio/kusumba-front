@@ -32,7 +32,14 @@ export function PublicProfilePage() {
 
 	const { data: profile, isLoading, isError } = usePublicUser(userId);
 	const { data: adsData, isLoading: adsLoading } = useAds(
-		useMemo(() => ({ userId: userId as string, limit: 24 }), [userId]),
+		useMemo(
+			() => ({
+				userId: userId as string,
+				limit: 24,
+				includeClosed: true,
+			}),
+			[userId],
+		),
 	);
 	const { data: reviewsData, isLoading: reviewsLoading } =
 		useUserReviews(userId);
@@ -83,7 +90,9 @@ export function PublicProfilePage() {
 			});
 			return;
 		}
-		const targetAd = adsData?.items?.[0];
+		const targetAd = (adsData?.items ?? []).find(
+			(i) => i.status === 'ACTIVE',
+		);
 		if (!targetAd) {
 			toast.error(
 				'Este utilizador ainda não tem anúncios ativos para contacto.',
