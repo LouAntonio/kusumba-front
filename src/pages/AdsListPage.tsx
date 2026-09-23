@@ -17,11 +17,16 @@ import { EmptyState } from '../components/ui/EmptyState';
 import { Select } from '../components/ui/Select';
 import { AdCardSkeleton } from '../components/ui/Skeleton';
 import { Button } from '../components/ui/Button';
-import { AD_SORTS, AD_TYPE_LABELS, type AdType } from '../lib/types';
+import {
+	AD_SORTS,
+	AD_TYPE_LABELS,
+	type AdSort,
+	type AdType,
+} from '../lib/types';
 import { cn } from '../lib/cn';
 import { getApiError } from '../lib/axios';
 
-const SORT_LABELS: Record<(typeof AD_SORTS)[number], string> = {
+const SORT_LABELS: Record<AdSort, string> = {
 	newest: 'Mais recentes',
 	oldest: 'Mais antigos',
 	price_asc: 'Preço: menor para maior',
@@ -29,7 +34,7 @@ const SORT_LABELS: Record<(typeof AD_SORTS)[number], string> = {
 	distance: 'Mais próximos',
 };
 
-const MAX_RADIUS_KM = 199;
+const MAX_RADIUS_KM = 250;
 
 function parseRadius(value: string): number | undefined {
 	if (!value) {
@@ -44,81 +49,197 @@ function parseRadius(value: string): number | undefined {
 
 const TYPE_KEYS: AdType[] = ['SALE', 'TRADE', 'DONATION'];
 
+const SIDEBAR_PARAM_KEYS = [
+	'q',
+	'type',
+	'categorySlugs',
+	'featured',
+	'sortBy',
+	'minPrice',
+	'maxPrice',
+	'radiusKm',
+	'lat',
+	'lng',
+] as const;
+
+interface DraftFilters {
+	q: string;
+	type: string[];
+	categorySlugs: string[];
+	featured: boolean;
+	sortBy: AdSort;
+	minPrice: string;
+	maxPrice: string;
+	radiusKm: string;
+	lat: string;
+	lng: string;
+}
+
+const EMPTY_DRAFT: DraftFilters = {
+	q: '',
+	type: [],
+	categorySlugs: [],
+	featured: false,
+	sortBy: 'newest',
+	minPrice: '',
+	maxPrice: '',
+	radiusKm: '',
+	lat: '',
+	lng: '',
+};
+
+function draftFromParams(params: URLSearchParams): DraftFilters {
+	const rawSortBy = params.get('sortBy');
+	const sortBy =
+		rawSortBy && AD_SORTS.includes(rawSortBy as AdSort)
+			? (rawSortBy as AdSort)
+			: 'newest';
+	return {
+		q: params.get('q') ?? '',
+		type: (params.get('type') ?? '').split(',').filter(Boolean),
+		categorySlugs: (params.get('categorySlugs') ?? '')
+			.split(',')
+			.filter(Boolean),
+		featured: params.get('featured') === 'true',
+		sortBy,
+		minPrice: params.get('minPrice') ?? '',
+		maxPrice: params.get('maxPrice') ?? '',
+		radiusKm: params.get('radiusKm') ?? '',
+		lat: params.get('lat') ?? '',
+		lng: params.get('lng') ?? '',
+	};
+}
+
+function draftToParams(draft: DraftFilters): URLSearchParams {
+	const next = new URLSearchParams();
+	if (draft.q) {
+		next.set('q', draft.q);
+	}
+	if (draft.type.length) {
+		next.set('type', draft.type.join(','));
+	}
+	if (draft.categorySlugs.length) {
+		next.set('categorySlugs', draft.categorySlugs.join(','));
+	}
+	if (draft.featured) {
+		next.set('featured', 'true');
+	}
+	if (draft.sortBy !== 'newest') {
+		next.set('sortBy', draft.sortBy);
+	}
+	if (draft.minPrice) {
+		next.set('minPrice', draft.minPrice);
+	}
+	if (draft.maxPrice) {
+		next.set('maxPrice', draft.maxPrice);
+	}
+	if (draft.lat && draft.lng) {
+		next.set('lat', draft.lat);
+		next.set('lng', draft.lng);
+		if (draft.radiusKm) {
+			next.set('radiusKm', draft.radiusKm);
+		}
+	}
+	return next;
+}
+
 export function AdsListPage() {
 	const [params, setParams] = useSearchParams();
 	const user = useAuthStore((s) => s.user);
 
 	const q = params.get('q') ?? '';
-	const type = params.get('type') ?? undefined;
-	const categorySlugs = params.get('categorySlugs') ?? undefined;
-	const featured = params.get('featured') === 'true';
-	const sortBy =
-		(params.get('sortBy') as (typeof AD_SORTS)[number]) ?? 'newest';
-	const minPrice = params.get('minPrice') ?? '';
-	const maxPrice = params.get('maxPrice') ?? '';
-	const radiusKm = params.get('radiusKm') ?? '';
-	const lat = params.get('lat') ?? '';
-	const lng = params.get('lng') ?? '';
-	const hasLocation = Boolean(lat && lng);
-	const distanceUnavailable = sortBy === 'distance' && !hasLocation;
-	const effectiveSortBy: (typeof AD_SORTS)[number] = distanceUnavailable
+	const appliedType = params.get('type') ?? undefined;
+	const appliedCategorySlugs = params.get('categorySlugs') ?? undefined;
+	const appliedFeatured = params.get('featured') === 'true';
+	const appliedSortBy = (params.get('sortBy') as AdSort | null) ?? 'newest';
+	const appliedMinPrice = params.get('minPrice') ?? '';
+	const appliedMaxPrice = params.get('maxPrice') ?? '';
+	const appliedRadiusKm = params.get('radiusKm') ?? '';
+	const appliedLat = params.get('lat') ?? '';
+	const appliedLng = params.get('lng') ?? '';
+
+	const appliedSlugs = useMemo(
+		() =>
+			appliedCategorySlugs
+				? appliedCategorySlugs.split(',').filter(Boolean)
+				: [],
+		[appliedCategorySlugs],
+	);
+
+	const appliedTypes = useMemo(
+		() => (appliedType ? appliedType.split(',').filter(Boolean) : []),
+		[appliedType],
+	);
+
+	const hasLocation = Boolean(appliedLat && appliedLng);
+	const distanceUnavailable = appliedSortBy === 'distance' && !hasLocation;
+	const effectiveSortBy: AdSort = distanceUnavailable
 		? 'newest'
-		: sortBy;
-	const effectiveRadiusKm = parseRadius(radiusKm);
+		: appliedSortBy;
+	const effectiveRadiusKm = parseRadius(appliedRadiusKm);
 
-	const [locBusy, setLocBusy] = useState(false);
-	const [locError, setLocError] = useState<string | null>(null);
-
-	const selectedSlugs = useMemo(
-		() => (categorySlugs ? categorySlugs.split(',').filter(Boolean) : []),
-		[categorySlugs],
-	);
-
-	const selectedTypes = useMemo(
-		() => (type ? type.split(',').filter(Boolean) : []),
-		[type],
-	);
-
-	const query = useMemo(() => {
-		const result: Record<string, unknown> = {
+	const query = useMemo(
+		() => ({
 			limit: 24,
 			q: q || undefined,
-			type: selectedTypes.length ? selectedTypes.join(',') : undefined,
-			categorySlugs: selectedSlugs.length
-				? selectedSlugs.join(',')
+			type: appliedTypes.length ? appliedTypes.join(',') : undefined,
+			categorySlugs: appliedSlugs.length
+				? appliedSlugs.join(',')
 				: undefined,
-			featured: featured,
+			featured: appliedFeatured,
 			sortBy: effectiveSortBy,
-			minPrice: minPrice ? Number(minPrice) : undefined,
-			maxPrice: maxPrice ? Number(maxPrice) : undefined,
-			lat: lat ? Number(lat) : undefined,
-			lng: lng ? Number(lng) : undefined,
+			minPrice: appliedMinPrice ? Number(appliedMinPrice) : undefined,
+			maxPrice: appliedMaxPrice ? Number(appliedMaxPrice) : undefined,
+			lat: appliedLat ? Number(appliedLat) : undefined,
+			lng: appliedLng ? Number(appliedLng) : undefined,
 			radiusKm: effectiveRadiusKm,
-		};
-		return result;
-	}, [
-		q,
-		selectedTypes,
-		selectedSlugs,
-		featured,
-		effectiveSortBy,
-		effectiveRadiusKm,
-		minPrice,
-		maxPrice,
-		lat,
-		lng,
-	]);
+		}),
+		[
+			q,
+			appliedTypes,
+			appliedSlugs,
+			appliedFeatured,
+			effectiveSortBy,
+			effectiveRadiusKm,
+			appliedMinPrice,
+			appliedMaxPrice,
+			appliedLat,
+			appliedLng,
+		],
+	);
 
 	const { data, isLoading, isError, error } = useAds(query);
 	const { data: categories } = useCategories();
 
 	const favoritesSet = useFavoriteSet();
 
-	const updateParams = (patch: Record<string, string | undefined>) => {
+	const [draft, setDraft] = useState<DraftFilters>(() =>
+		draftFromParams(params),
+	);
+	const [prevSearch, setPrevSearch] = useState(params.toString());
+
+	if (prevSearch !== params.toString()) {
+		setPrevSearch(params.toString());
+		setDraft(draftFromParams(params));
+	}
+
+	const [locBusy, setLocBusy] = useState(false);
+	const [locError, setLocError] = useState<string | null>(null);
+
+	const draftHasLocation = Boolean(draft.lat && draft.lng);
+	const draftDistanceUnavailable =
+		draft.sortBy === 'distance' && !draftHasLocation;
+	const draftRadius = draft.radiusKm || '10';
+
+	const patchDraft = (patch: Partial<DraftFilters>) =>
+		setDraft((d) => ({ ...d, ...patch }));
+
+	const applyFilters = () => {
 		const next = new URLSearchParams(params);
-		for (const [key, value] of Object.entries(patch)) {
-			if (value) {
-				next.set(key, value);
+		const draftParams = draftToParams(draft);
+		for (const key of SIDEBAR_PARAM_KEYS) {
+			if (draftParams.has(key)) {
+				next.set(key, draftParams.get(key)!);
 			} else {
 				next.delete(key);
 			}
@@ -126,31 +247,31 @@ export function AdsListPage() {
 		setParams(next, { replace: true });
 	};
 
-	const updateParam = (key: string, value: string) => {
-		updateParams({ [key]: value });
-	};
-
 	const clearAllFilters = () => {
-		const next = new URLSearchParams();
-		setParams(next);
+		setDraft(EMPTY_DRAFT);
+		setParams(new URLSearchParams());
 	};
 
 	const toggleCategory = (slug: string) => {
-		const has = selectedSlugs.includes(slug);
-		const next = has
-			? selectedSlugs.filter((s) => s !== slug)
-			: [...selectedSlugs, slug];
-		updateParams({
-			categorySlugs: next.length ? next.join(',') : undefined,
+		setDraft((d) => {
+			const has = d.categorySlugs.includes(slug);
+			return {
+				...d,
+				categorySlugs: has
+					? d.categorySlugs.filter((s) => s !== slug)
+					: [...d.categorySlugs, slug],
+			};
 		});
 	};
 
 	const toggleType = (t: AdType) => {
-		const has = selectedTypes.includes(t);
-		const next = has
-			? selectedTypes.filter((x) => x !== t)
-			: [...selectedTypes, t];
-		updateParams({ type: next.length ? next.join(',') : undefined });
+		setDraft((d) => {
+			const has = d.type.includes(t);
+			return {
+				...d,
+				type: has ? d.type.filter((x) => x !== t) : [...d.type, t],
+			};
+		});
 	};
 
 	const useMyLocation = () => {
@@ -162,11 +283,12 @@ export function AdsListPage() {
 		setLocError(null);
 		navigator.geolocation.getCurrentPosition(
 			(pos) => {
-				updateParams({
+				setDraft((d) => ({
+					...d,
 					lat: pos.coords.latitude.toFixed(6),
 					lng: pos.coords.longitude.toFixed(6),
-					radiusKm: radiusKm || '10',
-				});
+					radiusKm: d.radiusKm || '10',
+				}));
 				setLocBusy(false);
 			},
 			() => {
@@ -181,22 +303,33 @@ export function AdsListPage() {
 
 	const clearLocation = () => {
 		setLocError(null);
-		updateParams({ lat: undefined, lng: undefined, radiusKm: undefined });
+		patchDraft({ lat: '', lng: '', radiusKm: '' });
 	};
+
+	const hasActiveDraft = Boolean(
+		draft.q ||
+		draft.type.length ||
+		draft.categorySlugs.length ||
+		draft.featured ||
+		draft.sortBy !== 'newest' ||
+		draft.minPrice ||
+		draft.maxPrice ||
+		draft.lat,
+	);
 
 	const hasFilters = Boolean(
 		q ||
-		selectedTypes.length ||
-		selectedSlugs.length ||
-		featured ||
-		minPrice ||
-		maxPrice ||
-		lat,
+		appliedTypes.length ||
+		appliedSlugs.length ||
+		appliedFeatured ||
+		appliedMinPrice ||
+		appliedMaxPrice ||
+		appliedLat,
 	);
 
 	const currentCategoryName =
-		selectedSlugs.length === 1
-			? (categories ?? []).find((c) => c.slug === selectedSlugs[0])?.name
+		appliedSlugs.length === 1
+			? (categories ?? []).find((c) => c.slug === appliedSlugs[0])?.name
 			: undefined;
 
 	const title = q
@@ -221,14 +354,63 @@ export function AdsListPage() {
 							<h2 className="font-display text-sm font-semibold text-slate-800">
 								Filtros
 							</h2>
-							{hasFilters && (
+							{hasActiveDraft && (
 								<button
+									type="button"
 									onClick={clearAllFilters}
-									className="inline-flex items-center gap-1 text-xs font-medium text-primary-600 hover:underline"
+									aria-label="Limpar filtros"
+									className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700"
 								>
-									<FaTimes className="h-3 w-3" /> Limpar
+									<FaTimes className="h-4 w-4" />
 								</button>
 							)}
+						</div>
+
+						<form
+							className="relative"
+							role="search"
+							onSubmit={(e) => {
+								e.preventDefault();
+								applyFilters();
+							}}
+						>
+							<FaSearch className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
+							<input
+								type="text"
+								value={draft.q}
+								onChange={(e) =>
+									patchDraft({ q: e.target.value })
+								}
+								placeholder="Pesquisar anúncios…"
+								aria-label="Pesquisar anúncios"
+								className="h-10 w-full rounded-lg border border-slate-300 pl-9 pr-3 text-sm outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+							/>
+						</form>
+
+						<div className="space-y-2">
+							<p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+								Tipo
+							</p>
+							<div className="flex flex-wrap gap-2">
+								{TYPE_KEYS.map((t) => {
+									const active = draft.type.includes(t);
+									return (
+										<button
+											key={t}
+											type="button"
+											onClick={() => toggleType(t)}
+											className={cn(
+												'rounded-full border px-3 py-1.5 text-xs font-medium transition',
+												active
+													? 'border-primary-600 bg-primary-600 text-white'
+													: 'border-slate-200 bg-white text-slate-600 hover:border-primary-400 hover:text-primary-700',
+											)}
+										>
+											{AD_TYPE_LABELS[t]}
+										</button>
+									);
+								})}
+							</div>
 						</div>
 
 						<div className="space-y-2">
@@ -237,7 +419,7 @@ export function AdsListPage() {
 							</p>
 							<div className="flex flex-wrap gap-2">
 								{(categories ?? []).map((cat) => {
-									const active = selectedSlugs.includes(
+									const active = draft.categorySlugs.includes(
 										cat.slug,
 									);
 									return (
@@ -261,37 +443,11 @@ export function AdsListPage() {
 							</div>
 						</div>
 
-						<div className="space-y-2">
-							<p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-								Tipo
-							</p>
-							<div className="flex flex-wrap gap-2">
-								{TYPE_KEYS.map((t) => {
-									const active = selectedTypes.includes(t);
-									return (
-										<button
-											key={t}
-											type="button"
-											onClick={() => toggleType(t)}
-											className={cn(
-												'rounded-full border px-3 py-1.5 text-xs font-medium transition',
-												active
-													? 'border-primary-600 bg-primary-600 text-white'
-													: 'border-slate-200 bg-white text-slate-600 hover:border-primary-400 hover:text-primary-700',
-											)}
-										>
-											{AD_TYPE_LABELS[t]}
-										</button>
-									);
-								})}
-							</div>
-						</div>
-
 						<div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
 							<p className="text-xs font-medium uppercase tracking-wide text-slate-400">
 								Distância
 							</p>
-							{lat && lng ? (
+							{draftHasLocation ? (
 								<>
 									<div className="flex items-center gap-2 text-xs text-slate-600">
 										<FaMapMarkerAlt className="h-3.5 w-3.5 text-primary-600" />
@@ -306,7 +462,7 @@ export function AdsListPage() {
 												Distância máx.
 											</label>
 											<span className="inline-flex items-center gap-1 rounded-md bg-white px-2 py-1 text-xs font-semibold text-primary-700 ring-1 ring-slate-200">
-												{radiusKm ? radiusKm : '10'} km
+												{draftRadius} km
 											</span>
 										</div>
 										<input
@@ -314,14 +470,11 @@ export function AdsListPage() {
 											type="range"
 											min="1"
 											max={MAX_RADIUS_KM}
-											value={
-												radiusKm ? Number(radiusKm) : 10
-											}
+											value={Number(draftRadius)}
 											onChange={(e) =>
-												updateParam(
-													'radiusKm',
-													e.target.value,
-												)
+												patchDraft({
+													radiusKm: e.target.value,
+												})
 											}
 											className="h-2 w-full cursor-pointer accent-primary-600"
 										/>
@@ -333,9 +486,7 @@ export function AdsListPage() {
 											type="number"
 											min="1"
 											max={MAX_RADIUS_KM}
-											value={
-												radiusKm ? Number(radiusKm) : 10
-											}
+											value={Number(draftRadius)}
 											onChange={(e) => {
 												const v = e.target.value;
 												if (
@@ -344,7 +495,9 @@ export function AdsListPage() {
 														Number(v) <=
 															MAX_RADIUS_KM)
 												) {
-													updateParam('radiusKm', v);
+													patchDraft({
+														radiusKm: v,
+													});
 												}
 											}}
 											className="h-8 w-full rounded-lg border border-slate-300 bg-white px-2 text-sm"
@@ -382,7 +535,7 @@ export function AdsListPage() {
 									{locError}
 								</p>
 							)}
-							{!locError && !lat && (
+							{!locError && !draft.lat && (
 								<p className="text-[11px] text-slate-400">
 									Para ordenar por proximidade e filtrar por
 									raio.
@@ -397,11 +550,9 @@ export function AdsListPage() {
 							</span>
 							<input
 								type="checkbox"
-								checked={featured}
+								checked={draft.featured}
 								onChange={() =>
-									updateParams({
-										featured: featured ? undefined : 'true',
-									})
+									patchDraft({ featured: !draft.featured })
 								}
 								className="h-4 w-4 rounded border-slate-300 text-amber-500 focus:ring-amber-400"
 							/>
@@ -410,16 +561,18 @@ export function AdsListPage() {
 						<div className="space-y-4">
 							<Select
 								label="Ordenar por"
-								value={sortBy}
+								value={draft.sortBy}
 								onChange={(e) =>
-									updateParam('sortBy', e.target.value)
+									patchDraft({
+										sortBy: e.target.value as AdSort,
+									})
 								}
 								options={AD_SORTS.map((s) => ({
 									value: s,
 									label: SORT_LABELS[s],
 								}))}
 							/>
-							{distanceUnavailable && (
+							{draftDistanceUnavailable && (
 								<p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
 									Para ordenar por proximidade, active a
 									localização em{' '}
@@ -441,29 +594,38 @@ export function AdsListPage() {
 									<input
 										type="number"
 										placeholder="Mín"
-										value={minPrice}
+										value={draft.minPrice}
 										onChange={(e) =>
-											updateParam(
-												'minPrice',
-												e.target.value,
-											)
+											patchDraft({
+												minPrice: e.target.value,
+											})
 										}
 										className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm"
 									/>
 									<input
 										type="number"
 										placeholder="Máx"
-										value={maxPrice}
+										value={draft.maxPrice}
 										onChange={(e) =>
-											updateParam(
-												'maxPrice',
-												e.target.value,
-											)
+											patchDraft({
+												maxPrice: e.target.value,
+											})
 										}
 										className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm"
 									/>
 								</div>
 							</div>
+						</div>
+
+						<div className="border-t border-slate-200 pt-4">
+							<Button
+								variant="primary"
+								size="lg"
+								fullWidth
+								onClick={applyFilters}
+							>
+								<FaSearch className="h-4 w-4" /> Pesquisar
+							</Button>
 						</div>
 					</div>
 				</aside>
