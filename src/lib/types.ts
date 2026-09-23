@@ -133,7 +133,7 @@ export interface Ad {
 		neighborhood?: string | null;
 		city?: string | null;
 	} | null;
-	categories: Category[];
+	categories?: Category[];
 }
 
 export interface Paginated<T> {

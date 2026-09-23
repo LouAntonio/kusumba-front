@@ -46,7 +46,7 @@ export function AdForm({
 	const [tradefor, setTradefor] = useState<string[]>(initial?.tradefor ?? []);
 	const [tradeInput, setTradeInput] = useState('');
 	const [categoryIds, setCategoryIds] = useState<string[]>(
-		initial?.categories.map((c) => c.id) ?? [],
+		initial?.categories?.map((c) => c.id) ?? [],
 	);
 	const [gallery, setGallery] = useState<GalleryItem[]>(
 		initial?.gallery ?? [],

@@ -19,6 +19,7 @@ import { AdCardSkeleton } from '../components/ui/Skeleton';
 import { Button } from '../components/ui/Button';
 import { AD_SORTS, AD_TYPE_LABELS, type AdType } from '../lib/types';
 import { cn } from '../lib/cn';
+import { getApiError } from '../lib/axios';
 
 const SORT_LABELS: Record<(typeof AD_SORTS)[number], string> = {
 	newest: 'Mais recentes',
@@ -29,6 +30,17 @@ const SORT_LABELS: Record<(typeof AD_SORTS)[number], string> = {
 };
 
 const MAX_RADIUS_KM = 199;
+
+function parseRadius(value: string): number | undefined {
+	if (!value) {
+		return undefined;
+	}
+	const n = Math.round(Number(value));
+	if (!Number.isFinite(n) || n < 1 || n > MAX_RADIUS_KM) {
+		return undefined;
+	}
+	return n;
+}
 
 const TYPE_KEYS: AdType[] = ['SALE', 'TRADE', 'DONATION'];
 
@@ -47,6 +59,12 @@ export function AdsListPage() {
 	const radiusKm = params.get('radiusKm') ?? '';
 	const lat = params.get('lat') ?? '';
 	const lng = params.get('lng') ?? '';
+	const hasLocation = Boolean(lat && lng);
+	const distanceUnavailable = sortBy === 'distance' && !hasLocation;
+	const effectiveSortBy: (typeof AD_SORTS)[number] = distanceUnavailable
+		? 'newest'
+		: sortBy;
+	const effectiveRadiusKm = parseRadius(radiusKm);
 
 	const [locBusy, setLocBusy] = useState(false);
 	const [locError, setLocError] = useState<string | null>(null);
@@ -70,12 +88,12 @@ export function AdsListPage() {
 				? selectedSlugs.join(',')
 				: undefined,
 			featured: featured,
-			sortBy,
+			sortBy: effectiveSortBy,
 			minPrice: minPrice ? Number(minPrice) : undefined,
 			maxPrice: maxPrice ? Number(maxPrice) : undefined,
 			lat: lat ? Number(lat) : undefined,
 			lng: lng ? Number(lng) : undefined,
-			radiusKm: radiusKm ? Number(radiusKm) : undefined,
+			radiusKm: effectiveRadiusKm,
 		};
 		return result;
 	}, [
@@ -83,15 +101,15 @@ export function AdsListPage() {
 		selectedTypes,
 		selectedSlugs,
 		featured,
-		sortBy,
+		effectiveSortBy,
+		effectiveRadiusKm,
 		minPrice,
 		maxPrice,
 		lat,
 		lng,
-		radiusKm,
 	]);
 
-	const { data, isLoading } = useAds(query);
+	const { data, isLoading, isError, error } = useAds(query);
 	const { data: categories } = useCategories();
 
 	const favoritesSet = useFavoriteSet();
@@ -401,6 +419,20 @@ export function AdsListPage() {
 									label: SORT_LABELS[s],
 								}))}
 							/>
+							{distanceUnavailable && (
+								<p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+									Para ordenar por proximidade, active a
+									localização em{' '}
+									<span className="font-semibold">
+										Distância
+									</span>
+									. A ordenação voltou a{' '}
+									<span className="font-semibold">
+										mais recentes
+									</span>
+									.
+								</p>
+							)}
 							<div>
 								<label className="text-sm font-medium text-slate-700">
 									Faixa de preço (Kz)
@@ -442,6 +474,30 @@ export function AdsListPage() {
 							{Array.from({ length: 6 }).map((_, i) => (
 								<AdCardSkeleton key={i} />
 							))}
+						</div>
+					) : isError ? (
+						<div
+							className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-6 py-12 text-center"
+							role="alert"
+						>
+							<FaBoxOpen className="h-8 w-8 text-red-300" />
+							<div>
+								<h2 className="font-display text-lg font-semibold text-red-700">
+									Erro ao carregar os anúncios
+								</h2>
+								<p className="mt-1 max-w-md text-sm text-red-600">
+									{getApiError(error)}
+								</p>
+							</div>
+							{hasFilters && (
+								<Button
+									variant="outline"
+									onClick={clearAllFilters}
+								>
+									<FaSearch className="h-4 w-4" /> Limpar
+									filtros
+								</Button>
+							)}
 						</div>
 					) : (data?.items?.length ?? 0) === 0 ? (
 						<EmptyState

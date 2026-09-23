@@ -336,7 +336,7 @@ export function AdDetailPage() {
 
 						{(ad.categories?.length ?? 0) > 0 && (
 							<div className="mt-5 flex flex-wrap gap-2">
-								{ad.categories.map((cat) => (
+								{ad.categories?.map((cat) => (
 									<Badge key={cat.id} tone="neutral">
 										<Link
 											to={`/anuncios?categorySlugs=${cat.slug}`}
